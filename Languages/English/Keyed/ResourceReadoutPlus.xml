@@ -18,6 +18,19 @@
   <RRP_NoneToJumpTo>No {0} to jump to.</RRP_NoneToJumpTo>
 
   <!-- Groups -->
+  <RRP_Group_Essentials>Essentials</RRP_Group_Essentials>
+  <RRP_Group_Meat>Meat and fish</RRP_Group_Meat>
+  <RRP_Group_Vegetables>Vegetables</RRP_Group_Vegetables>
+  <RRP_Group_AnimalProducts>Animal products</RRP_Group_AnimalProducts>
+  <RRP_Group_AnimalFeed>Animal feed</RRP_Group_AnimalFeed>
+  <RRP_Group_SocialDrugs>Social drugs</RRP_Group_SocialDrugs>
+  <RRP_Group_HardDrugs>Hard drugs</RRP_Group_HardDrugs>
+  <RRP_Group_MedicalDrugs>Medical drugs</RRP_Group_MedicalDrugs>
+  <RRP_Group_Serums>Serums</RRP_Group_Serums>
+  <RRP_Group_PlantMatter>Plant matter</RRP_Group_PlantMatter>
+  <RRP_Group_Shells>Mortar shells</RRP_Group_Shells>
+  <RRP_Group_Ammo>Ammo</RRP_Group_Ammo>
+  <RRP_Group_BodyParts>Body parts</RRP_Group_BodyParts>
   <RRP_Group_Materials>Materials</RRP_Group_Materials>
   <RRP_Group_Food>Food</RRP_Group_Food>
   <RRP_Group_Meals>Meals</RRP_Group_Meals>
@@ -69,6 +82,43 @@
   <RRP_ShowAllHidden>Show all hidden</RRP_ShowAllHidden>
   <RRP_ResetOrder>Reset the {0} order</RRP_ResetOrder>
   <RRP_OpenSettings>Settings...</RRP_OpenSettings>
+  <RRP_OpenSettingsTip>Opens Resource Readout+'s settings: the list, names, width, background opacity, counting, trends and minimum stock.</RRP_OpenSettingsTip>
+  <RRP_Organize>Organize resources...</RRP_Organize>
+  <RRP_NewSubgroup>New subgroup...</RRP_NewSubgroup>
+  <RRP_NewSubgroupTitle>New group inside {0}</RRP_NewSubgroupTitle>
+  <RRP_MoveToTop>Move to the top level</RRP_MoveToTop>
+  <RRP_MoveGroupIntoItself>A group can't be moved inside itself.</RRP_MoveGroupIntoItself>
+
+  <!-- Organizer -->
+  <RRP_OrganizeTitle>Organize resources</RRP_OrganizeTitle>
+  <RRP_OrganizeFailed>The organizer hit an error and was closed for this session. The log has the details.</RRP_OrganizeFailed>
+  <RRP_OrganizeGroups>Groups</RRP_OrganizeGroups>
+  <RRP_OrganizeAll>All resources</RRP_OrganizeAll>
+  <RRP_OrganizeHidden>Hidden ({0})</RRP_OrganizeHidden>
+  <RRP_OrganizeGroupHint>Drag to reorder, use the eye to hide or show, right-click for more.</RRP_OrganizeGroupHint>
+  <RRP_OrganizeHiddenHint>Everything you hid. Show any of them again one by one.</RRP_OrganizeHiddenHint>
+  <RRP_OrganizeEmptyGroup>Nothing is in this group yet. Move resources here from All resources or the readout's right-click menu.</RRP_OrganizeEmptyGroup>
+  <RRP_OrganizeNoMatch>No resources match the search.</RRP_OrganizeNoMatch>
+  <RRP_OrganizeNothingHidden>Nothing is hidden.</RRP_OrganizeNothingHidden>
+  <RRP_OrganizeFamilyNote>{0} kinds, {1}</RRP_OrganizeFamilyNote>
+  <RRP_Show>Show</RRP_Show>
+  <RRP_ShowHideTip>Hidden resources are left out of the readout but can still count towards their group's total.</RRP_ShowHideTip>
+  <RRP_MoveToGroupTip>Puts this resource in another group.</RRP_MoveToGroupTip>
+  <RRP_KindGroup>group</RRP_KindGroup>
+  <RRP_KindCategory>category</RRP_KindCategory>
+  <RRP_KindFamily>combined look-alikes</RRP_KindFamily>
+  <RRP_KindThing>resource</RRP_KindThing>
+  <RRP_NewGroupTip>Makes a new group at the top level.</RRP_NewGroupTip>
+  <RRP_NewSubgroupTip>Makes a new group inside the selected group.</RRP_NewSubgroupTip>
+  <RRP_RenameTip>Renames the selected group. Clearing the name of a built-in group restores its usual name.</RRP_RenameTip>
+  <RRP_MoveGroupInto>Move into...</RRP_MoveGroupInto>
+  <RRP_MoveGroupIntoTip>Moves the selected group inside another group.</RRP_MoveGroupIntoTip>
+  <RRP_MoveToTopTip>Moves the selected group out to the top level.</RRP_MoveToTopTip>
+  <RRP_GroupUp>Move up</RRP_GroupUp>
+  <RRP_GroupUpTip>Moves the selected group above the one before it.</RRP_GroupUpTip>
+  <RRP_GroupDown>Move down</RRP_GroupDown>
+  <RRP_GroupDownTip>Moves the selected group below the one after it.</RRP_GroupDownTip>
+  <RRP_DeleteGroupTip>Deletes a group you made. Its resources go back to their usual groups, and its subgroups move up a level.</RRP_DeleteGroupTip>
 
   <!-- Dialogs -->
   <RRP_MinimumTitle>Minimum stock: {0}</RRP_MinimumTitle>
@@ -85,6 +135,9 @@
   <RRP_LowStockLine>{0}: {1} of {2}</RRP_LowStockLine>
 
   <!-- Settings -->
+  <RRP_SectionOrganize>Groups and hidden resources</RRP_SectionOrganize>
+  <RRP_OrganizeHint>Make, rename and nest groups, reorder and hide resources, and show hidden ones again.</RRP_OrganizeHint>
+  <RRP_ShowHiddenList>Hidden resources ({0})...</RRP_ShowHiddenList>
   <RRP_SectionDisplay>Display</RRP_SectionDisplay>
   <RRP_SectionCounting>Counting</RRP_SectionCounting>
   <RRP_SectionTrends>Trends</RRP_SectionTrends>
@@ -97,6 +150,8 @@
   <RRP_ShowNamesTip>Shows each resource's name beside its count. Without names the readout is narrower.</RRP_ShowNamesTip>
   <RRP_Width>Width with names</RRP_Width>
   <RRP_WidthTip>How wide the readout is when it shows names.</RRP_WidthTip>
+  <RRP_Opacity>Background opacity</RRP_Opacity>
+  <RRP_OpacityTip>How solid the readout's background is. Lower values let the map show through.</RRP_OpacityTip>
   <RRP_ShortNumbers>Short numbers</RRP_ShortNumbers>
   <RRP_ShortNumbersTip>Shows large counts shortened, such as 12.5k instead of 12,500.</RRP_ShortNumbersTip>
   <RRP_ShowZero>Show resources with a count of zero</RRP_ShowZero>
@@ -113,7 +168,7 @@
   <RRP_TrendHoursTip>The arrows compare the count now with the count this long ago.</RRP_TrendHoursTip>
   <RRP_Hours>{0} hours</RRP_Hours>
   <RRP_LowStockAlertSetting>Low stock alert</RRP_LowStockAlertSetting>
-  <RRP_LowStockAlertSettingTip>Shows an alert listing every resource below its minimum stock.</RRP_LowStockAlertSettingTip>
+  <RRP_LowStockAlertSettingTip>Shows an alert listing every resource below the minimum stock you set for it. No resource has a minimum until you set one from its right-click menu.</RRP_LowStockAlertSettingTip>
   <RRP_ClearMinimums>Clear all minimum stock ({0})</RRP_ClearMinimums>
   <RRP_ClearMinimumsTip>Removes every minimum stock you set.</RRP_ClearMinimumsTip>
   <RRP_ClearMinimumsConfirm>Remove every minimum stock?</RRP_ClearMinimumsConfirm>
@@ -132,7 +187,7 @@
   <RRP_UnpinAll>Unpin all ({0})</RRP_UnpinAll>
   <RRP_UnpinAllTip>Returns every pinned row to its place.</RRP_UnpinAllTip>
   <RRP_ResetFamilies>Reset combined look-alikes</RRP_ResetFamilies>
-  <RRP_ResetFamiliesTip>Combines leathers, wools and stone blocks again, and shows everything else separately.</RRP_ResetFamiliesTip>
+  <RRP_ResetFamiliesTip>Combines leathers, wools, stone blocks, fish and eggs again, and shows everything else separately.</RRP_ResetFamiliesTip>
   <RRP_NothingToClear>Nothing to clear.</RRP_NothingToClear>
   <RRP_NothingToReset>Nothing to reset.</RRP_NothingToReset>
 </LanguageData>

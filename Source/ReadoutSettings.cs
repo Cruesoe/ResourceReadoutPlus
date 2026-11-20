@@ -11,6 +11,10 @@ public class ReadoutSettings : ModSettings
     public const int MinTrendHours = 6;
     public const int MaxTrendHours = 120;
     public const int UsualTrendHours = 24;
+    public const float MinOpacity = 0.1f;
+
+    // Raised when new default look-alike families are added, so existing players get them once.
+    public const int CurrentFamilies = 2;
 
     // Display
     public ReadoutMode mode = ReadoutMode.Grouped;
@@ -19,6 +23,7 @@ public class ReadoutSettings : ModSettings
     public bool shortNumbers;
     public bool showZero;
     public bool folded;
+    public float opacity = 1f;
 
     // Counting
     public bool countHiddenInTotals = true;
@@ -42,6 +47,9 @@ public class ReadoutSettings : ModSettings
     public List<string> groupOrder = new List<string>();
     public List<CustomGroup> customGroups = new List<CustomGroup>();
     public Dictionary<string, string> groupLabels = new Dictionary<string, string>();
+
+    // Built-in groups moved under another group (or to the top level, as ""), by group key.
+    public Dictionary<string, string> groupParents = new Dictionary<string, string>();
     public int nextGroupId = 1;
 
     // Per row: hidden, counted map-wide, pinned to the top, minimum stock.
@@ -53,6 +61,7 @@ public class ReadoutSettings : ModSettings
     // Categories whose things show as one combined row.
     public List<string> families = new List<string>();
     public bool familiesSet;
+    public int familiesVersion;
 
     // Open state: groups start open, categories and families closed.
     public List<string> foldedGroups = new List<string>();
@@ -78,6 +87,7 @@ public class ReadoutSettings : ModSettings
         Scribe_Values.Look(ref shortNumbers, "shortNumbers", false);
         Scribe_Values.Look(ref showZero, "showZero", false);
         Scribe_Values.Look(ref folded, "folded", false);
+        Scribe_Values.Look(ref opacity, "opacity", 1f);
         Scribe_Values.Look(ref countHiddenInTotals, "countHiddenInTotals", true);
         Scribe_Values.Look(ref countCarried, "countCarried", false);
         Scribe_Values.Look(ref trends, "trends", true);
@@ -92,6 +102,7 @@ public class ReadoutSettings : ModSettings
         Scribe_Collections.Look(ref groupOrder, "groupOrder", LookMode.Value);
         Scribe_Collections.Look(ref customGroups, "customGroups", LookMode.Deep);
         Scribe_Collections.Look(ref groupLabels, "groupLabels", LookMode.Value, LookMode.Value);
+        Scribe_Collections.Look(ref groupParents, "groupParents", LookMode.Value, LookMode.Value);
         Scribe_Values.Look(ref nextGroupId, "nextGroupId", 1);
         Scribe_Collections.Look(ref hidden, "hidden", LookMode.Value);
         Scribe_Collections.Look(ref countAll, "countAll", LookMode.Value);
@@ -99,6 +110,7 @@ public class ReadoutSettings : ModSettings
         Scribe_Collections.Look(ref minimums, "minimums", LookMode.Value, LookMode.Value);
         Scribe_Collections.Look(ref families, "families", LookMode.Value);
         Scribe_Values.Look(ref familiesSet, "familiesSet", false);
+        Scribe_Values.Look(ref familiesVersion, "familiesVersion", 0);
         Scribe_Collections.Look(ref foldedGroups, "foldedGroups", LookMode.Value);
         Scribe_Collections.Look(ref openCategories, "openCategories", LookMode.Value);
         Scribe_Collections.Look(ref openFamilies, "openFamilies", LookMode.Value);
@@ -112,6 +124,7 @@ public class ReadoutSettings : ModSettings
         groupOrder ??= new List<string>();
         customGroups ??= new List<CustomGroup>();
         groupLabels ??= new Dictionary<string, string>();
+        groupParents ??= new Dictionary<string, string>();
         hidden ??= new List<string>();
         countAll ??= new List<string>();
         pinned ??= new List<string>();

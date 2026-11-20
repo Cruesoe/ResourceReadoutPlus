@@ -16,7 +16,11 @@ public static class Keys
     // Drag lists that aren't a group or category.
     public const string PinnedList = "PIN";
     public const string SimpleList = "SIMPLE";
-    public const string GroupsList = "GROUPS";
+
+    // Child groups of a group (or the top level, with nothing after the colon).
+    public const string GroupsList = "GROUPS:";
+
+    public static string GroupsOf(string? groupKey) => GroupsList + (groupKey ?? "");
 
     // Session lifetime: defs never change while the game runs.
     private static readonly System.Collections.Generic.Dictionary<Def, string> Cached = new System.Collections.Generic.Dictionary<Def, string>();

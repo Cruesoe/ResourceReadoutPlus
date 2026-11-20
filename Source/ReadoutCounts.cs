@@ -106,7 +106,7 @@ public static class ReadoutCounts
             {
                 foreach (ThingDef def in DefDatabase<ThingDef>.AllDefsListForReading)
                 {
-                    if (def.CountAsResource && ReadoutGroups.GroupOf(def) == group)
+                    if (def.CountAsResource && ReadoutGroups.IsWithin(ReadoutGroups.GroupOf(def), group))
                     {
                         CountAllDefs.Add(def);
                     }

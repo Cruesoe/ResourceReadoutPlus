@@ -11,4 +11,8 @@ public sealed class ReadoutUnit
     public ThingCategoryDef? family;
     public readonly List<ThingDef> members = new List<ThingDef>();
     public int index;
+
+    // Display text for the organizer window, filled when its list is built.
+    public string label = "";
+    public string note = "";
 }

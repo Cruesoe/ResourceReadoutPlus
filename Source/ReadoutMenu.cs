@@ -23,7 +23,9 @@ public static class ReadoutMenu
     private static readonly Texture2D DeleteTex = CoreWidgets.Icon("trash");
     private static readonly Texture2D NewTex = CoreWidgets.Icon("plus");
     private static readonly Texture2D ResetTex = CoreWidgets.Icon("arrow-clockwise");
-    private static readonly Texture2D SettingsTex = CoreWidgets.Icon("gear");
+    private static readonly Texture2D SettingsTex = CoreWidgets.Icon("gear-six");
+    private static readonly Texture2D OrganizeTex = CoreWidgets.Icon("list-checks");
+    private static readonly Texture2D TopTex = CoreWidgets.Icon("arrow-line-up");
 
     private static ReadoutSettings Settings => ReadoutMod.Settings;
 
@@ -120,6 +122,12 @@ public static class ReadoutMenu
         string group = Keys.GroupOf(row.key) ?? "";
         GroupInfo? info = ReadoutGroups.Find(group);
         section.items.Add(Item("RRP_Rename", RenameTex, () => Find.WindowStack.Add(new Dialog_GroupName("RRP_RenameGroup".Translate(), info?.label ?? row.label, label => ReadoutGroups.Rename(group, label)))));
+        section.items.Add(Item("RRP_NewSubgroup", NewTex, () => Find.WindowStack.Add(new Dialog_GroupName("RRP_NewSubgroupTitle".Translate(info?.label ?? row.label), "", label => ReadoutGroups.NewGroup(label, group)))));
+        if (info?.parent != null)
+        {
+            section.items.Add(Item("RRP_MoveToTop", TopTex, () => ReadoutPanel.PlaceGroup(group, null, ReadoutGroups.TopLevel.Count > 0 ? ReadoutGroups.TopLevel[ReadoutGroups.TopLevel.Count - 1].rowKey : null)));
+        }
+
         section.items.Add(Item("RRP_SetMinimum", MinimumTex, () => Find.WindowStack.Add(new Dialog_MinimumStock(row.key, row.label))));
         CountAllItem(section, row.key, null);
         section.items.Add(Item("RRP_HideGroup", HideTex, () => Hide(row.key)));
@@ -196,6 +204,7 @@ public static class ReadoutMenu
             section.items.Add(reset);
         }
 
+        section.items.Add(Item("RRP_Organize", OrganizeTex, () => Find.WindowStack.Add(new Window_OrganizeResources())));
         section.items.Add(Item("RRP_OpenSettings", SettingsTex, () => Find.WindowStack.Add(new Dialog_ModSettings(ReadoutMod.Instance))));
         return section;
     }
@@ -219,27 +228,42 @@ public static class ReadoutMenu
     private static void OpenGroupPicker(Row row)
     {
         string current = row.def != null ? ReadoutGroups.GroupOf(row.def) : "";
-        Find.WindowStack.Add(new ChoiceMenu("RRP_MoveToGroup".Translate(), GroupTex, () =>
+        OpenGroupPicker("RRP_MoveToGroup".Translate(), current, null, key => MoveToGroup(row, key), label => MoveToGroup(row, ReadoutGroups.NewGroup(label)));
+    }
+
+    // A menu of every group, indented by nesting; groups inside "except" are left out.
+    public static void OpenGroupPicker(string title, string current, string? except, System.Action<string> pick, System.Action<string>? makeNew)
+    {
+        Find.WindowStack.Add(new ChoiceMenu(title, GroupTex, () =>
         {
             ChoiceSection section = new ChoiceSection();
             foreach (GroupInfo group in ReadoutGroups.All)
             {
+                if (except != null && ReadoutGroups.IsWithin(group.key, except))
+                {
+                    continue;
+                }
+
                 string key = group.key;
                 section.items.Add(new ChoiceItem
                 {
-                    label = group.label,
+                    label = new string(' ', group.depth * 4) + group.label,
                     icon = group.icon,
                     on = key == current,
-                    action = () => MoveToGroup(row, key),
+                    action = () => pick(key),
                 });
             }
 
-            section.items.Add(Item("RRP_NewGroup", NewTex, () => Find.WindowStack.Add(new Dialog_GroupName("RRP_NewGroupTitle".Translate(), "", label => MoveToGroup(row, ReadoutGroups.NewGroup(label))))));
+            if (makeNew != null)
+            {
+                section.items.Add(Item("RRP_NewGroup", NewTex, () => Find.WindowStack.Add(new Dialog_GroupName("RRP_NewGroupTitle".Translate(), "", makeNew))));
+            }
+
             return new List<ChoiceSection> { section };
         }));
     }
 
-    private static void MoveToGroup(Row row, string group)
+    public static void MoveToGroup(Row row, string group)
     {
         if (row.kind == RowKind.Family && row.members != null)
         {
@@ -305,7 +329,7 @@ public static class ReadoutMenu
         Settings.Changed();
     }
 
-    private static void Hide(string key)
+    public static void Hide(string key)
     {
         if (!Settings.hidden.Contains(key))
         {

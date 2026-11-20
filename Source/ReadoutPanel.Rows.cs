@@ -47,9 +47,22 @@ public static partial class ReadoutPanel
         }
     }
 
+    private const int HeaderSalt = 52611;
+    private const int ThingSalt = 52612;
+
+    // Header backgrounds follow the panel's opacity setting.
     private static void DrawHeader(Row row, Rect rect)
     {
-        CoreWidgets.GroupRow(rect, !row.open);
+        float opacity = Opacity;
+        float hover = ThemeMotion.Hover(rect, HeaderSalt, Mouse.IsOver(rect));
+        Rounded.Fill(rect, Faces.Fade(Theme.BG, opacity));
+        Rounded.Border(rect, Faces.Fade(Color.Lerp(Color.Lerp(Theme.BGDark, Theme.HighlightGray, 0.35f), Theme.HighlightGray, hover * 0.5f), opacity));
+        if (hover > 0f)
+        {
+            Rounded.Fill(rect.ContractedBy(2f), new Color(1f, 1f, 1f, 0.06f * hover));
+        }
+
+        CoreWidgets.DrawIcon(new Rect(rect.x + 6f, rect.y, 12f, rect.height), row.open ? CoreWidgets.ExpandedTex : CoreWidgets.CollapsedTex, Color.Lerp(Theme.TextFaint, Theme.TextBright, hover), 12f);
         if (row.low)
         {
             Rounded.Fill(rect.ContractedBy(1f), Faces.Fade(LowColor, 0.18f));
@@ -79,7 +92,15 @@ public static partial class ReadoutPanel
 
     private static void DrawThing(Row row, Rect rect, int index)
     {
-        CoreWidgets.ListRow(rect, false, index % 2 == 1, Theme.HighlightGray);
+        float opacity = Opacity;
+        float hover = ThemeMotion.Hover(rect, ThingSalt, Mouse.IsOver(rect));
+        Color fill = index % 2 == 1 ? Color.Lerp(Theme.BG, Theme.BGDark, 0.5f) : Theme.BG;
+        Rounded.Fill(rect, Faces.Fade(fill, opacity));
+        if (hover > 0f)
+        {
+            Rounded.Fill(rect, new Color(1f, 1f, 1f, 0.05f * hover));
+        }
+
         if (row.low)
         {
             Rounded.Fill(rect.ContractedBy(1f), Faces.Fade(LowColor, 0.18f));

@@ -27,6 +27,7 @@ public static partial class ReadoutPanel
 
     private static readonly Texture2D TitleTex = CoreWidgets.Icon("stack");
     private static readonly Texture2D SearchTex = CoreWidgets.Icon("magnifying-glass");
+    private static readonly Texture2D SettingsTex = CoreWidgets.Icon("gear-six");
     private static readonly Texture2D GroupedTex = CoreWidgets.Icon("squares-four");
     private static readonly Texture2D SimpleTex = CoreWidgets.Icon("list");
     private static readonly Texture2D CategorizedTex = CoreWidgets.Icon("tree-structure");
@@ -44,6 +45,8 @@ public static partial class ReadoutPanel
     private static string? searchHint;
     private static string? searchTip;
     private static string? empty;
+    private static string? settingsTitle;
+    private static string? settingsTip;
     private static readonly Dictionary<ReadoutMode, string> ModeTips = new Dictionary<ReadoutMode, string>();
     private static LoadedLanguage? textLanguage;
 
@@ -105,6 +108,8 @@ public static partial class ReadoutPanel
         searchHint = "RRP_SearchHint".Translate();
         searchTip = "RRP_SearchTip".Translate();
         empty = "RRP_Empty".Translate();
+        settingsTitle = "RRP_OpenSettings".Translate();
+        settingsTip = "RRP_OpenSettingsTip".Translate();
         ModeTips.Clear();
         foreach (ReadoutMode mode in Enum.GetValues(typeof(ReadoutMode)))
         {
@@ -152,17 +157,26 @@ public static partial class ReadoutPanel
         panelRect = new Rect(Left, Top, width, Mathf.Min(wanted, most));
 
         bool folded = Settings.folded;
-        bool open = SidePanel.Begin(panelRect, title, TitleTex, ref folded, SidePanel.Side.Left, out Rect inner, out Rect titleBar, out float right, tools: 64f);
-        if (folded != Settings.folded)
+        float surface = CoreWidgets.SurfaceAlpha;
+        CoreWidgets.SurfaceAlpha = Opacity;
+        try
         {
-            Settings.folded = folded;
-            Settings.Changed();
-        }
+            bool open = SidePanel.Begin(panelRect, title, TitleTex, ref folded, SidePanel.Side.Left, out Rect inner, out Rect titleBar, out float right, tools: 96f);
+            if (folded != Settings.folded)
+            {
+                Settings.folded = folded;
+                Settings.Changed();
+            }
 
-        if (open)
+            if (open)
+            {
+                TitleTools(titleBar, right);
+                DrawBody(inner, rows);
+            }
+        }
+        finally
         {
-            TitleTools(titleBar, right);
-            DrawBody(inner, rows);
+            CoreWidgets.SurfaceAlpha = surface;
         }
 
         if (interactive)
@@ -171,8 +185,16 @@ public static partial class ReadoutPanel
         }
     }
 
+    // The panel's background opacity, from the settings slider.
+    public static float Opacity => Mathf.Clamp(Settings.opacity, ReadoutSettings.MinOpacity, 1f);
+
     private static void TitleTools(Rect titleBar, float right)
     {
+        if (CoreWidgets.TitleTool(titleBar, ref right, SettingsTex, settingsTitle, settingsTip))
+        {
+            Failsafe.Later(() => Find.WindowStack.Add(new Dialog_ModSettings(ReadoutMod.Instance)));
+        }
+
         if (CoreWidgets.TitleTool(titleBar, ref right, ModeIcon(Settings.mode), ModeLabel(Settings.mode), ModeTips[Settings.mode]))
         {
             Settings.mode = NextMode(Settings.mode);

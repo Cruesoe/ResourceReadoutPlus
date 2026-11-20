@@ -17,9 +17,11 @@ public static class SettingsPage
     private static readonly Texture2D ImportTex = CoreWidgets.Icon("arrow-line-down");
     private static readonly Texture2D ResetTex = CoreWidgets.Icon("arrow-clockwise");
     private static readonly Texture2D ModeTex = CoreWidgets.Icon("rows");
+    private static readonly Texture2D OrganizeTex = CoreWidgets.Icon("list-checks");
+    private static readonly Texture2D HiddenTex = CoreWidgets.Icon("eye-slash");
 
     // Session lifetime: which cards are open, starting all open.
-    private static readonly List<string> Open = new List<string> { "Display", "Counting", "Trends", "Stock", "Import", "Reset" };
+    private static readonly List<string> Open = new List<string> { "Organize", "Display", "Counting", "Trends", "Stock", "Import", "Reset" };
     private static SettingsCards? cards;
     private static Vector2 leftScroll;
     private static Vector2 rightScroll;
@@ -54,7 +56,8 @@ public static class SettingsPage
 
     private static float DrawLeft(float y, float width)
     {
-        y = cards!.Card(y, width, "Display", DisplayTex, "RRP_SectionDisplay".Translate(), null, Display);
+        y = cards!.Card(y, width, "Organize", OrganizeTex, "RRP_SectionOrganize".Translate(), null, Organize);
+        y = cards.Card(y, width, "Display", DisplayTex, "RRP_SectionDisplay".Translate(), null, Display);
         y = cards.Card(y, width, "Counting", CountingTex, "RRP_SectionCounting".Translate(), null, Counting);
         return y;
     }
@@ -68,6 +71,27 @@ public static class SettingsPage
         return y;
     }
 
+    private static void Organize(Listing_Standard listing)
+    {
+        SettingsCards.Hint(listing, "RRP_OrganizeHint".Translate());
+        if (Button(listing, "RRP_Organize".Translate(), OrganizeTex))
+        {
+            cards!.Later(() => Find.WindowStack.Add(new Window_OrganizeResources()));
+        }
+
+        listing.Gap(4f);
+        if (Button(listing, "RRP_ShowHiddenList".Translate(Settings.hidden.Count), HiddenTex))
+        {
+            cards!.Later(() => Find.WindowStack.Add(new Window_OrganizeResources(Window_OrganizeResources.ShowHidden)));
+        }
+    }
+
+    private static bool Button(Listing_Standard listing, string label, Texture icon)
+    {
+        Rect line = listing.GetRect(30f);
+        return CoreWidgets.Button(new Rect(line.x, line.y, Mathf.Min(line.width, CoreWidgets.ButtonWidth(label, true)), line.height), label, icon);
+    }
+
     private static void Display(Listing_Standard listing)
     {
         Rect line = listing.GetRect(30f);
@@ -78,6 +102,12 @@ public static class SettingsPage
             value => Mathf.RoundToInt(value).ToString(), ReadoutSettings.UsualWidth, value =>
             {
                 Settings.width = value;
+                Settings.Changed();
+            });
+        cards.Slider(listing, "RRP_Opacity".Translate(), "RRP_OpacityTip".Translate(), Settings.opacity, ReadoutSettings.MinOpacity, 1f, 0.05f,
+            value => Mathf.RoundToInt(value * 100f) + "%", 1f, value =>
+            {
+                Settings.opacity = value;
                 Settings.Changed();
             });
         Tick(listing, "RRP_ShortNumbers", ref Settings.shortNumbers);

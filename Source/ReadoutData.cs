@@ -255,10 +255,11 @@ public static partial class ReadoutData
         return total;
     }
 
-    private static int GroupTotal(string group)
+    // A group's total, its child groups included.
+    private static int GroupTotal(GroupInfo group)
     {
         int total = 0;
-        if (ByGroup.TryGetValue(group, out List<ThingDef>? defs))
+        if (ByGroup.TryGetValue(group.key, out List<ThingDef>? defs))
         {
             foreach (ThingDef def in defs)
             {
@@ -266,6 +267,14 @@ public static partial class ReadoutData
                 {
                     total += CountOf(def);
                 }
+            }
+        }
+
+        foreach (GroupInfo child in group.children)
+        {
+            if (InTotal(child.rowKey))
+            {
+                total += GroupTotal(child);
             }
         }
 
@@ -299,7 +308,7 @@ public static partial class ReadoutData
             }
             else if (Keys.GroupOf(key) is string group && ReadoutGroups.Find(group) is GroupInfo info)
             {
-                total = GroupTotal(group);
+                total = GroupTotal(info);
                 label = info.label;
             }
             else
@@ -319,13 +328,15 @@ public static partial class ReadoutData
 
     // ---- Units: things and look-alike families ------------------------------------------
 
-    private static List<ReadoutUnit> UnitsOf(List<ThingDef> defs, ReadoutMode mode)
+    // Things and look-alike families in their saved order; pinned rows are left out unless asked for.
+    public static List<ReadoutUnit> UnitsOf(List<ThingDef> defs, ReadoutMode mode, bool withPinned = false)
     {
+        EnsureSets();
         List<ReadoutUnit> units = new List<ReadoutUnit>();
         Dictionary<ThingCategoryDef, ReadoutUnit>? families = null;
         foreach (ThingDef def in defs)
         {
-            if (Pinned.Contains(Keys.Of(def)))
+            if (!withPinned && Pinned.Contains(Keys.Of(def)))
             {
                 continue;
             }
@@ -342,7 +353,7 @@ public static partial class ReadoutData
             {
                 unit = new ReadoutUnit { key = FamilyKey(family), family = family, index = units.Count };
                 families[family] = unit;
-                if (!Pinned.Contains(unit.key))
+                if (withPinned || !Pinned.Contains(unit.key))
                 {
                     units.Add(unit);
                 }
@@ -637,67 +648,136 @@ public static partial class ReadoutData
 
     private static void BuildGrouped(Map map)
     {
-        List<GroupInfo> groups = ReadoutGroups.All;
-        List<string> groupKeys = new List<string>(groups.Count);
+        AddGroupLevel(map, ReadoutGroups.TopLevel, Keys.GroupsOf(null));
+    }
+
+    private static void AddGroupLevel(Map map, List<GroupInfo> groups, string list)
+    {
+        List<string> keys = new List<string>(groups.Count);
         foreach (GroupInfo group in groups)
         {
-            groupKeys.Add(group.rowKey);
+            keys.Add(group.rowKey);
         }
 
-        ListUnits[Keys.GroupsList] = groupKeys;
+        ListUnits[list] = keys;
         foreach (GroupInfo group in groups)
         {
-            if (Hidden.Contains(group.rowKey))
+            AddGroup(map, group, list);
+        }
+    }
+
+    // Adds a group's header, then (when open) its child groups and its own things.
+    private static void AddGroup(Map map, GroupInfo group, string list)
+    {
+        if (Hidden.Contains(group.rowKey) || !GroupShown(group, 0))
+        {
+            return;
+        }
+
+        List<ThingDef> defs = ByGroup.TryGetValue(group.key, out List<ThingDef>? found) ? found : new List<ThingDef>();
+        List<ReadoutUnit> units = UnitsOf(defs, ReadoutMode.Grouped);
+        ListUnits[group.rowKey] = UnitKeys(units);
+
+        Row header = new Row
+        {
+            kind = RowKind.Group,
+            key = group.rowKey,
+            label = group.label,
+            icon = group.icon,
+            depth = group.depth,
+            count = GroupTotal(group),
+            expandable = true,
+            open = !FoldedGroups.Contains(group.rowKey),
+            low = GroupLow(group, 0),
+            draggable = true,
+            list = list,
+            unit = group.rowKey,
+            opens = group.rowKey,
+        };
+        Finish(header);
+        Rows.Add(header);
+        if (!header.open)
+        {
+            return;
+        }
+
+        AddGroupLevel(map, group.children, group.childList);
+        foreach (ReadoutUnit unit in units)
+        {
+            if (UnitVisible(unit))
             {
-                continue;
+                AddUnit(map, unit, group.depth + 1, group.rowKey);
             }
+        }
+    }
 
-            List<ThingDef> defs = ByGroup.TryGetValue(group.key, out List<ThingDef>? found) ? found : new List<ThingDef>();
-            List<ReadoutUnit> units = UnitsOf(defs, ReadoutMode.Grouped);
-            ListUnits[group.rowKey] = UnitKeys(units);
+    // A group shows when anything inside it shows; the player's own groups show even when empty, so things can be dropped into them.
+    private static bool GroupShown(GroupInfo group, int depth)
+    {
+        if (group.custom || LowKeys.Contains(group.rowKey))
+        {
+            return true;
+        }
 
-            List<ReadoutUnit> visible = new List<ReadoutUnit>();
-            bool low = LowKeys.Contains(group.rowKey);
-            foreach (ReadoutUnit unit in units)
+        if (ByGroup.TryGetValue(group.key, out List<ThingDef>? defs))
+        {
+            foreach (ThingDef def in defs)
             {
-                if (UnitVisible(unit))
+                if (!Pinned.Contains(Keys.Of(def)) && Visible(def, CountOf(def)))
                 {
-                    visible.Add(unit);
-                    low |= UnitLow(unit);
-                }
-            }
-
-            // The player's own groups stay on show when empty, so things can be dropped into them.
-            if (visible.Count == 0 && !group.custom && !low)
-            {
-                continue;
-            }
-
-            Row header = new Row
-            {
-                kind = RowKind.Group,
-                key = group.rowKey,
-                label = group.label,
-                icon = group.icon,
-                count = GroupTotal(group.key),
-                expandable = true,
-                open = !FoldedGroups.Contains(group.rowKey),
-                low = low,
-                draggable = true,
-                list = Keys.GroupsList,
-                unit = group.rowKey,
-                opens = group.rowKey,
-            };
-            Finish(header);
-            Rows.Add(header);
-
-            if (header.open)
-            {
-                foreach (ReadoutUnit unit in visible)
-                {
-                    AddUnit(map, unit, 1, group.rowKey);
+                    return true;
                 }
             }
         }
+
+        if (depth < MaxDepth)
+        {
+            foreach (GroupInfo child in group.children)
+            {
+                if (!Hidden.Contains(child.rowKey) && GroupShown(child, depth + 1))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static bool GroupLow(GroupInfo group, int depth)
+    {
+        if (LowKeys.Count == 0)
+        {
+            return false;
+        }
+
+        if (LowKeys.Contains(group.rowKey))
+        {
+            return true;
+        }
+
+        if (ByGroup.TryGetValue(group.key, out List<ThingDef>? defs))
+        {
+            foreach (ThingDef def in defs)
+            {
+                if (LowKeys.Contains(Keys.Of(def)) || (FamilyOf(def) is ThingCategoryDef family && LowKeys.Contains(FamilyKey(family))))
+                {
+                    return true;
+                }
+            }
+        }
+
+        if (depth < MaxDepth)
+        {
+            foreach (GroupInfo child in group.children)
+            {
+                if (GroupLow(child, depth + 1))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
