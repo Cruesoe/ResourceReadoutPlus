@@ -105,7 +105,7 @@ public static class SettingsPage
                 Settings.Changed();
             });
         cards.Slider(listing, "RRP_Opacity".Translate(), "RRP_OpacityTip".Translate(), Settings.opacity, ReadoutSettings.MinOpacity, 1f, 0.05f,
-            value => Mathf.RoundToInt(value * 100f) + "%", 1f, value =>
+            value => Mathf.RoundToInt(value * 100f) + "%", ReadoutSettings.DefaultOpacity, value =>
             {
                 Settings.opacity = value;
                 Settings.Changed();

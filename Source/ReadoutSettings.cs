@@ -13,6 +13,9 @@ public class ReadoutSettings : ModSettings
     public const int UsualTrendHours = 24;
     public const float MinOpacity = 0.1f;
 
+    // Matches the background of UI Rethemed - Notifications' alert and message rows.
+    public const float DefaultOpacity = 0.6f;
+
     // Raised when new default look-alike families are added, so existing players get them once.
     public const int CurrentFamilies = 2;
 
@@ -23,7 +26,7 @@ public class ReadoutSettings : ModSettings
     public bool shortNumbers;
     public bool showZero;
     public bool folded;
-    public float opacity = 1f;
+    public float opacity = DefaultOpacity;
 
     // Counting
     public bool countHiddenInTotals = true;
@@ -87,7 +90,7 @@ public class ReadoutSettings : ModSettings
         Scribe_Values.Look(ref shortNumbers, "shortNumbers", false);
         Scribe_Values.Look(ref showZero, "showZero", false);
         Scribe_Values.Look(ref folded, "folded", false);
-        Scribe_Values.Look(ref opacity, "opacity", 1f);
+        Scribe_Values.Look(ref opacity, "opacity", DefaultOpacity);
         Scribe_Values.Look(ref countHiddenInTotals, "countHiddenInTotals", true);
         Scribe_Values.Look(ref countCarried, "countCarried", false);
         Scribe_Values.Look(ref trends, "trends", true);
