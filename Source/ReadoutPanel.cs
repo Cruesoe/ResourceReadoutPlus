@@ -38,6 +38,11 @@ public static partial class ReadoutPanel
     private static Rect outRect;
     private static float contentHeight;
     private static bool interactive;
+
+    // Where the panel ended on the last frame it was drawn, for placing the top-left messages beside it.
+    private const float MessageGap = 8f;
+    private static float drawnRight;
+    private static int drawnFrame = -10;
     private static readonly Action Draw = DrawPanel;
 
     // Translated once per language.
@@ -155,6 +160,8 @@ public static partial class ReadoutPanel
         float most = UI.screenHeight - Top - BottomRoom;
         float wanted = Settings.folded ? FoldedHeight : TitleHeight + Gap * 2f + (searching ? SearchHeight + Gap : 0f) + contentHeight;
         panelRect = new Rect(Left, Top, width, Mathf.Min(wanted, most));
+        drawnRight = panelRect.xMax;
+        drawnFrame = Time.frameCount;
 
         bool folded = Settings.folded;
         float surface = CoreWidgets.SurfaceAlpha;
@@ -183,6 +190,12 @@ public static partial class ReadoutPanel
         {
             CoreWidgets.TakeClicks(panelRect);
         }
+    }
+
+    // The messages' left edge: right of the panel when it was drawn this frame or the last, else the base game's.
+    public static float MessagesX(float usual)
+    {
+        return Time.frameCount - drawnFrame <= 1 ? Mathf.Max(usual, drawnRight + MessageGap) : usual;
     }
 
     // The panel's background opacity, from the settings slider.
