@@ -26,7 +26,7 @@
   <RRP_Group_SocialDrugs>Social drugs</RRP_Group_SocialDrugs>
   <RRP_Group_HardDrugs>Hard drugs</RRP_Group_HardDrugs>
   <RRP_Group_MedicalDrugs>Medical drugs</RRP_Group_MedicalDrugs>
-  <RRP_Group_Serums>Serums</RRP_Group_Serums>
+  <RRP_Group_Serums>Serums and catalysts</RRP_Group_Serums>
   <RRP_Group_PlantMatter>Plant matter</RRP_Group_PlantMatter>
   <RRP_Group_Shells>Mortar shells</RRP_Group_Shells>
   <RRP_Group_Ammo>Ammo</RRP_Group_Ammo>
@@ -39,6 +39,7 @@
   <RRP_Group_Textiles>Textiles</RRP_Group_Textiles>
   <RRP_Group_Manufactured>Manufactured</RRP_Group_Manufactured>
   <RRP_Group_Items>Items</RRP_Group_Items>
+  <RRP_Group_Waste>Waste</RRP_Group_Waste>
   <RRP_Group_Other>Other</RRP_Group_Other>
 
   <!-- Tooltips -->

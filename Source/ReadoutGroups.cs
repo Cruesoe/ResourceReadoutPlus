@@ -13,6 +13,11 @@ public static class ReadoutGroups
 {
     public const string Other = "Other";
     private const string Drugs = "Drugs";
+    private const string Ammo = "Ammo";
+    private const string Waste = "Waste";
+
+    // Mods' categories and things claimed by name: any ammo category, and waste, trash and garbage.
+    private static readonly string[] WasteWords = { "Waste", "Trash", "Garbage" };
     private const string CustomPrefix = "Custom";
     private const int MaxDepth = 64;
 
@@ -25,8 +30,8 @@ public static class ReadoutGroups
         ("Vegetables", "plant", "Food", new[] { "PlantFoodRaw" }, new string[0]),
         ("AnimalProducts", "egg", "Food", new[] { "AnimalProductRaw" }, new string[0]),
         ("AnimalFeed", "paw-print", "Food", new string[0], new[] { "Hay", "Kibble" }),
-        ("Meals", "bowl-food", null, new[] { "FoodMeals" }, new string[0]),
-        ("Medicine", "first-aid-kit", null, new[] { "Medicine" }, new string[0]),
+        ("Meals", "bowl-food", null, new[] { "FoodMeals" }, new[] { "Pemmican", "Chocolate", "BabyFood" }),
+        ("Medicine", "first-aid-kit", null, new[] { "Medicine" }, new[] { "HemogenPack" }),
         (Drugs, "pill", null, new[] { "Drugs" }, new string[0]),
         ("SocialDrugs", "beer-stein", Drugs, new string[0], new string[0]),
         ("HardDrugs", "flask", Drugs, new string[0], new string[0]),
@@ -36,10 +41,11 @@ public static class ReadoutGroups
         ("Materials", "cube", null, new[] { "ResourcesRaw", "StoneBlocks", "StoneChunks" }, new string[0]),
         ("PlantMatter", "leaf", "Materials", new[] { "PlantMatter" }, new string[0]),
         ("Manufactured", "wrench", null, new[] { "Manufactured" }, new string[0]),
-        ("Shells", "bomb", "Manufactured", new[] { "MortarShells" }, new string[0]),
-        ("Ammo", "crosshair", null, new[] { "Ammo" }, new string[0]),
-        ("Items", "package", null, new[] { "Items" }, new string[0]),
+        (Ammo, "crosshair", null, new[] { "Ammo" }, new string[0]),
+        ("Shells", "bomb", Ammo, new[] { "MortarShells" }, new string[0]),
+        ("Items", "package", null, new[] { "Items", "ApparelUtility" }, new string[0]),
         ("BodyParts", "heartbeat", "Items", new[] { "BodyParts" }, new string[0]),
+        (Waste, "trash", null, new string[0], new[] { "Wastepack" }),
         (Other, "squares-four", null, new string[0], new string[0]),
     };
 
@@ -170,7 +176,13 @@ public static class ReadoutGroups
             }
         }
 
-        // Drugs split by kind; anything else stays in Drugs itself.
+        // Things no category claims go to Waste when their name says so (meat named after a waste animal keeps its category).
+        if (key == Other && IsWaste(def.defName))
+        {
+            return Waste;
+        }
+
+        // Drugs split by kind; serums and anything without a drug kind (mech serums, catalysts) go to Serums.
         if (key == Drugs)
         {
             if (def.defName.EndsWith("Serum"))
@@ -186,10 +198,25 @@ public static class ReadoutGroups
                     return "HardDrugs";
                 case DrugCategory.Medical:
                     return "MedicalDrugs";
+                default:
+                    return "Serums";
             }
         }
 
         return key;
+    }
+
+    private static bool IsWaste(string defName)
+    {
+        foreach (string word in WasteWords)
+        {
+            if (defName.IndexOf(word, System.StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static void BuildMaps()
@@ -215,6 +242,23 @@ public static class ReadoutGroups
             foreach (string defName in things)
             {
                 byDefName[defName] = key;
+            }
+        }
+
+        foreach (ThingCategoryDef category in DefDatabase<ThingCategoryDef>.AllDefsListForReading)
+        {
+            if (byCategory.ContainsKey(category))
+            {
+                continue;
+            }
+
+            if (category.defName.IndexOf(Ammo, System.StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                byCategory[category] = Ammo;
+            }
+            else if (IsWaste(category.defName))
+            {
+                byCategory[category] = Waste;
             }
         }
     }
@@ -373,10 +417,13 @@ public static class ReadoutGroups
             ranks[Settings.groupOrder[i]] = i;
         }
 
+        // A group missing from a saved order (a new built-in one) follows the group listed before it.
         List<(GroupInfo group, int rank, int index)> keyed = new List<(GroupInfo, int, int)>();
+        int previous = -1;
         for (int i = 0; i < natural.Count; i++)
         {
-            keyed.Add((natural[i], ranks.TryGetValue(natural[i].rowKey, out int rank) ? rank : int.MaxValue, i));
+            previous = ranks.TryGetValue(natural[i].rowKey, out int rank) ? rank : previous;
+            keyed.Add((natural[i], previous, i));
         }
 
         keyed.Sort((a, b) => a.rank != b.rank ? a.rank.CompareTo(b.rank) : a.index.CompareTo(b.index));

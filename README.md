@@ -2,7 +2,7 @@
 
 Replaces the resource list at the top left of the map with a panel in the look of the UI Rethemed mods.
 
-- Resources sorted into foldable, nested groups with totals: essentials, food (meat and fish, vegetables, animal products, animal feed), meals, medicine, drugs (social, hard, medical, serums), textiles, materials, manufactured goods, ammo and items. Make your own groups and subgroups, rename, reorder and nest any of them.
+- Resources sorted into foldable, nested groups with totals: essentials, food (meat and fish, vegetables, animal products, animal feed), meals, medicine, drugs (social, hard, medical, serums and catalysts), textiles, materials, manufactured goods, ammo (mortar shells and any mod ammo), items and waste. Make your own groups and subgroups, rename, reorder and nest any of them.
 - An organizer window for groups and resources: drag resources into order, hide or show them one by one, search every resource and move it to any group.
 - Look-alike items such as leathers, wools, stone blocks, fish and eggs combined into one row that opens to show each kind.
 - The base game's simple list and category tree as alternative modes, in the same look.
