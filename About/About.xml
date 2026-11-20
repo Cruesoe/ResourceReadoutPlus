@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+  <name>Resource Readout+</name>
+  <author>Cruesoe</author>
+  <packageId>cruesoe.resourcereadoutplus</packageId>
+  <modVersion IgnoreIfNoMatchingField="True">261120</modVersion>
+  <supportedVersions>
+    <li>1.6</li>
+    <li>1.7</li>
+  </supportedVersions>
+  <modDependencies>
+    <li>
+      <packageId>brrainz.harmony</packageId>
+      <displayName>Harmony</displayName>
+      <steamWorkshopUrl>steam://url/CommunityFilePage/2009463077</steamWorkshopUrl>
+      <downloadUrl>https://github.com/pardeike/HarmonyRimWorld/releases/latest</downloadUrl>
+    </li>
+    <li>
+      <packageId>LazyFridayStudio.UIRethemed.Core</packageId>
+      <displayName>[LFS] UI Rethemed - Core</displayName>
+      <steamWorkshopUrl>steam://url/CommunityFilePage/3832843406</steamWorkshopUrl>
+    </li>
+  </modDependencies>
+  <loadAfter>
+    <li>brrainz.harmony</li>
+    <li>LazyFridayStudio.UIRethemed.Core</li>
+    <li>cruesoe.vanillauiplus</li>
+  </loadAfter>
+  <description>Replaces the resource list at the top left of the map with a tidy panel in the look of the UI Rethemed mods.
+
+Resources are sorted into groups you recognize: building materials, food, meals, medicine, drugs, textiles, manufactured goods and items. Each group can be folded, shows its total, and can be renamed, reordered or replaced with groups of your own. Look-alike items such as leathers, wools and stone blocks are combined into one row that opens to show each kind. The simple list and the category tree from the base game are still there as options, in the same look.
+
+Every row can show the item's name, and hovering it shows its description, how many you have in storage and elsewhere on the map, their value and how the count has changed. Click a row to jump to where it is stored, clicking again for the next stack. Drag rows to reorder them or move them into another group. Right-click a row to pin it to the top, set a minimum stock, see its history, count every one on the map rather than just what is in storage, combine or separate look-alikes, or hide it. Rows below their minimum turn red, with an optional alert listing everything running low. Small arrows show what has gone up or down over the last day. A search box filters the list.
+
+Players of Vanilla UI+ keep their resource order, hidden rows and counting choices: they are brought over on first start, and Vanilla UI+ leaves the resource list to this mod.
+
+Needs UI Rethemed - Core. Safe to add to an existing save. Removing it leaves a harmless one-time error about its saved trend history when the save next loads.</description>
+</ModMetaData>

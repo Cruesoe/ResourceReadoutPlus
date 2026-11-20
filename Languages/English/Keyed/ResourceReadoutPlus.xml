@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <!-- Panel -->
+  <RRP_SettingsCategory>Resource Readout+</RRP_SettingsCategory>
+  <RRP_Title>Resources</RRP_Title>
+  <RRP_Empty>Nothing stored yet.</RRP_Empty>
+  <RRP_Pinned>Pinned</RRP_Pinned>
+  <RRP_SearchHint>Search resources</RRP_SearchHint>
+  <RRP_SearchTip>Show only resources whose name contains the text. Click again to close the search.</RRP_SearchTip>
+  <RRP_ModeTip>Showing the {0} list. Click to switch to the {1} list.</RRP_ModeTip>
+  <RRP_Mode_Grouped>grouped</RRP_Mode_Grouped>
+  <RRP_Mode_Simple>simple</RRP_Mode_Simple>
+  <RRP_Mode_Categorized>categorized</RRP_Mode_Categorized>
+  <RRP_Mode_GroupedTip>Resources sorted into groups you can fold, rename, reorder and add to.</RRP_Mode_GroupedTip>
+  <RRP_Mode_SimpleTip>One list of everything, like the base game's simple list.</RRP_Mode_SimpleTip>
+  <RRP_Mode_CategorizedTip>The base game's category tree.</RRP_Mode_CategorizedTip>
+  <RRP_MoveIntoItself>A category can't be moved inside itself.</RRP_MoveIntoItself>
+  <RRP_NoneToJumpTo>No {0} to jump to.</RRP_NoneToJumpTo>
+
+  <!-- Groups -->
+  <RRP_Group_Materials>Materials</RRP_Group_Materials>
+  <RRP_Group_Food>Food</RRP_Group_Food>
+  <RRP_Group_Meals>Meals</RRP_Group_Meals>
+  <RRP_Group_Medicine>Medicine</RRP_Group_Medicine>
+  <RRP_Group_Drugs>Drugs</RRP_Group_Drugs>
+  <RRP_Group_Textiles>Textiles</RRP_Group_Textiles>
+  <RRP_Group_Manufactured>Manufactured</RRP_Group_Manufactured>
+  <RRP_Group_Items>Items</RRP_Group_Items>
+  <RRP_Group_Other>Other</RRP_Group_Other>
+
+  <!-- Tooltips -->
+  <RRP_TipInStorage>In storage: {0}</RRP_TipInStorage>
+  <RRP_TipOnMap>On the map: {0} (counting everything, not just storage)</RRP_TipOnMap>
+  <RRP_TipOutsideStorage>Outside storage: {0}</RRP_TipOutsideStorage>
+  <RRP_TipValue>Value: {0}</RRP_TipValue>
+  <RRP_TipChange>Change over the last {1} hours: {0}</RRP_TipChange>
+  <RRP_TipFamily>{0} kinds combined.</RRP_TipFamily>
+  <RRP_TipTotal>Total: {0}</RRP_TipTotal>
+  <RRP_TipMinimum>Minimum stock: {0}</RRP_TipMinimum>
+  <RRP_TipBelowMinimum>Below the minimum stock of {0}.</RRP_TipBelowMinimum>
+  <RRP_TipItemHelp>Click to jump to where it is stored, again for the next stack. Drag to move it. Right-click for options.</RRP_TipItemHelp>
+  <RRP_TipGroupHelp>Click to open or close. Drag to move it. Right-click for options.</RRP_TipGroupHelp>
+  <RRP_TipMenuHelp>Right-click for options.</RRP_TipMenuHelp>
+
+  <!-- Right-click menu -->
+  <RRP_Pin>Pin to the top</RRP_Pin>
+  <RRP_Unpin>Unpin</RRP_Unpin>
+  <RRP_SetMinimum>Set minimum stock...</RRP_SetMinimum>
+  <RRP_History>History...</RRP_History>
+  <RRP_HistoryOffTip>Turn on trends in the mod settings to record history.</RRP_HistoryOffTip>
+  <RRP_CountAll>Count all on map</RRP_CountAll>
+  <RRP_CountAllTip>Counts every one of this lying on the map (except under fog), not just what is in storage. On a category or group, this applies to everything inside it.</RRP_CountAllTip>
+  <RRP_CountAllInheritedTip>Already counted in full because its category or group is set to count all on the map.</RRP_CountAllInheritedTip>
+  <RRP_Combine>Combine all {0}</RRP_Combine>
+  <RRP_Separate>Show each kind of {0} separately</RRP_Separate>
+  <RRP_MoveToGroup>Move to group...</RRP_MoveToGroup>
+  <RRP_ReturnToPlace>Return to its usual place</RRP_ReturnToPlace>
+  <RRP_Hide>Hide</RRP_Hide>
+  <RRP_HideGroup>Hide group</RRP_HideGroup>
+  <RRP_Rename>Rename...</RRP_Rename>
+  <RRP_RenameGroup>Rename group</RRP_RenameGroup>
+  <RRP_DeleteGroup>Delete group</RRP_DeleteGroup>
+  <RRP_DeleteGroupConfirm>Delete the group {0}? Everything in it goes back to its usual group.</RRP_DeleteGroupConfirm>
+  <RRP_NewGroup>New group...</RRP_NewGroup>
+  <RRP_NewGroupTitle>New group</RRP_NewGroupTitle>
+  <RRP_MenuReadout>Readout</RRP_MenuReadout>
+  <RRP_Unhide>Unhide... ({0})</RRP_Unhide>
+  <RRP_UnhideTitle>Unhide</RRP_UnhideTitle>
+  <RRP_ShowAllHidden>Show all hidden</RRP_ShowAllHidden>
+  <RRP_ResetOrder>Reset the {0} order</RRP_ResetOrder>
+  <RRP_OpenSettings>Settings...</RRP_OpenSettings>
+
+  <!-- Dialogs -->
+  <RRP_MinimumTitle>Minimum stock: {0}</RRP_MinimumTitle>
+  <RRP_MinimumHint>Below this amount the row turns red and the low stock alert lists it.</RRP_MinimumHint>
+  <RRP_MinimumSet>Set</RRP_MinimumSet>
+  <RRP_MinimumClear>Clear</RRP_MinimumClear>
+  <RRP_MinimumClearTip>Removes the minimum stock from this row.</RRP_MinimumClearTip>
+  <RRP_HistoryTitle>{0}: history</RRP_HistoryTitle>
+  <RRP_HistoryEmpty>Counts are recorded every hour. Check back later.</RRP_HistoryEmpty>
+
+  <!-- Alert -->
+  <RRP_LowStockAlert>Low stock ({0})</RRP_LowStockAlert>
+  <RRP_LowStockAlertDesc>These resources are below the minimum stock you set in the resource readout:</RRP_LowStockAlertDesc>
+  <RRP_LowStockLine>{0}: {1} of {2}</RRP_LowStockLine>
+
+  <!-- Settings -->
+  <RRP_SectionDisplay>Display</RRP_SectionDisplay>
+  <RRP_SectionCounting>Counting</RRP_SectionCounting>
+  <RRP_SectionTrends>Trends</RRP_SectionTrends>
+  <RRP_SectionStock>Minimum stock</RRP_SectionStock>
+  <RRP_SectionImport>Vanilla UI+</RRP_SectionImport>
+  <RRP_SectionReset>Reset</RRP_SectionReset>
+  <RRP_Mode>List</RRP_Mode>
+  <RRP_ModeSettingTip>How the readout lists resources. The button on its title bar switches too.</RRP_ModeSettingTip>
+  <RRP_ShowNames>Show names</RRP_ShowNames>
+  <RRP_ShowNamesTip>Shows each resource's name beside its count. Without names the readout is narrower.</RRP_ShowNamesTip>
+  <RRP_Width>Width with names</RRP_Width>
+  <RRP_WidthTip>How wide the readout is when it shows names.</RRP_WidthTip>
+  <RRP_ShortNumbers>Short numbers</RRP_ShortNumbers>
+  <RRP_ShortNumbersTip>Shows large counts shortened, such as 12.5k instead of 12,500.</RRP_ShortNumbersTip>
+  <RRP_ShowZero>Show resources with a count of zero</RRP_ShowZero>
+  <RRP_ShowZeroTip>Lists every resource the colony could stock, even ones you have none of. Categories that could never hold anything stay hidden.</RRP_ShowZeroTip>
+  <RRP_CountHiddenInTotals>Count hidden rows in totals</RRP_CountHiddenInTotals>
+  <RRP_CountHiddenInTotalsTip>Hidden resources still add to their group's or category's total.</RRP_CountHiddenInTotalsTip>
+  <RRP_CountCarried>Count what colonists carry</RRP_CountCarried>
+  <RRP_CountCarriedTip>For rows set to count all on the map, also counts what colonists carry and hold in their inventories.</RRP_CountCarriedTip>
+  <RRP_ClearCountAll>Stop counting all on map ({0})</RRP_ClearCountAll>
+  <RRP_ClearCountAllTip>Every row goes back to counting only what is in storage.</RRP_ClearCountAllTip>
+  <RRP_Trends>Show trends</RRP_Trends>
+  <RRP_TrendsTip>Records every resource's count each hour, saved with the game, and marks rows that went up or down. Needed for the history window.</RRP_TrendsTip>
+  <RRP_TrendHours>Trend period</RRP_TrendHours>
+  <RRP_TrendHoursTip>The arrows compare the count now with the count this long ago.</RRP_TrendHoursTip>
+  <RRP_Hours>{0} hours</RRP_Hours>
+  <RRP_LowStockAlertSetting>Low stock alert</RRP_LowStockAlertSetting>
+  <RRP_LowStockAlertSettingTip>Shows an alert listing every resource below its minimum stock.</RRP_LowStockAlertSettingTip>
+  <RRP_ClearMinimums>Clear all minimum stock ({0})</RRP_ClearMinimums>
+  <RRP_ClearMinimumsTip>Removes every minimum stock you set.</RRP_ClearMinimumsTip>
+  <RRP_ClearMinimumsConfirm>Remove every minimum stock?</RRP_ClearMinimumsConfirm>
+  <RRP_ImportHint>Vanilla UI+'s resource order, hidden rows and counting choices were brought over the first time this mod started. Bring them over again here.</RRP_ImportHint>
+  <RRP_ImportNow>Bring over from Vanilla UI+</RRP_ImportNow>
+  <RRP_ImportNowTip>Adds Vanilla UI+'s saved resource order, moves, hidden rows and count-all rows to this mod's own.</RRP_ImportNowTip>
+  <RRP_ImportNotFound>No Vanilla UI+ settings were found.</RRP_ImportNotFound>
+  <RRP_Imported>Vanilla UI+'s resource settings were brought over.</RRP_Imported>
+  <RRP_ImportedNothing>Nothing new to bring over from Vanilla UI+.</RRP_ImportedNothing>
+  <RRP_ResetOrderTip>Puts every row of this list back in its usual order and place.</RRP_ResetOrderTip>
+  <RRP_ResetGroups>Remove your groups and names</RRP_ResetGroups>
+  <RRP_ResetGroupsTip>Deletes the groups you made and gives the built-in groups their usual names.</RRP_ResetGroupsTip>
+  <RRP_ResetGroupsConfirm>Delete every group you made and restore the usual group names?</RRP_ResetGroupsConfirm>
+  <RRP_ShowAllHiddenCount>Show all hidden ({0})</RRP_ShowAllHiddenCount>
+  <RRP_ShowAllHiddenTip>Shows every row you hid.</RRP_ShowAllHiddenTip>
+  <RRP_UnpinAll>Unpin all ({0})</RRP_UnpinAll>
+  <RRP_UnpinAllTip>Returns every pinned row to its place.</RRP_UnpinAllTip>
+  <RRP_ResetFamilies>Reset combined look-alikes</RRP_ResetFamilies>
+  <RRP_ResetFamiliesTip>Combines leathers, wools and stone blocks again, and shows everything else separately.</RRP_ResetFamiliesTip>
+  <RRP_NothingToClear>Nothing to clear.</RRP_NothingToClear>
+  <RRP_NothingToReset>Nothing to reset.</RRP_NothingToReset>
+</LanguageData>

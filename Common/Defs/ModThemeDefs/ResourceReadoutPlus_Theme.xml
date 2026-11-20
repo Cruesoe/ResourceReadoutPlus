@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <!-- Resource Readout+'s tab on UI Rethemed - Core's settings page; the readout reads these colors by key. -->
+  <UIRethemed.Core.ModThemeDef>
+    <defName>ResourceReadoutPlus_Theme</defName>
+    <label>resource readout+</label>
+    <description>The resource readout at the top left of the map.</description>
+    <mod>cruesoe.resourcereadoutplus</mod>
+    <icon>stack</icon>
+    <order>300</order>
+    <colors>
+      <li>
+        <key>Low</key>
+        <label>low stock</label>
+        <description>Rows below their minimum stock: their count and background.</description>
+        <group>Readout</group>
+        <color>Red</color>
+      </li>
+      <li>
+        <key>Rising</key>
+        <label>rising</label>
+        <description>The arrow beside a count that went up.</description>
+        <group>Readout</group>
+        <color>Green</color>
+      </li>
+      <li>
+        <key>Falling</key>
+        <label>falling</label>
+        <description>The arrow beside a count that went down.</description>
+        <group>Readout</group>
+        <color>Yellow</color>
+      </li>
+    </colors>
+  </UIRethemed.Core.ModThemeDef>
+</Defs>

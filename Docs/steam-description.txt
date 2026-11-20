@@ -1,0 +1,33 @@
+[b]Replaces the resource list at the top left of the map with a tidy, foldable panel that tells you what you have, what's running low and what's changing.[/b]
+
+No more columns of unlabeled icons: resources are sorted into groups you recognize, with names, totals and helpful tooltips. It's built on [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3832843406]UI Rethemed - Core[/url] and matches the look of the UI Rethemed mods.
+
+[h2]Features[/h2]
+[list]
+[*][b]Groups:[/b] Materials, food, meals, medicine, drugs, textiles, manufactured goods and items, each with its total. Click a group to fold it. Rename them, drag them into a new order, or make groups of your own.
+[*][b]Look-alikes combined:[/b] Leathers, wools and stone blocks show as one row with the total, which opens to show each kind. Combine any other category from the right-click menu.
+[*][b]Three lists:[/b] Grouped, simple or the base game's category tree, switched from the button on the panel's title bar. Every list gets names, tooltips and the features below.
+[*][b]Names:[/b] Each row can show the item's name beside its count, with an adjustable panel width.
+[*][b]Tooltips:[/b] Hover a row for its description, how many are in storage and lying elsewhere on the map, their value and how the count has changed.
+[*][b]Jump to it:[/b] Click a row to jump to where it's stored; click again for the next stack.
+[*][b]Drag and drop:[/b] Drag rows to reorder them, into another group or category, or onto the pinned section.
+[*][b]Pinned rows:[/b] Keep the resources you watch most at the top.
+[*][b]Minimum stock:[/b] Set a minimum on any row, group or category. Below it the row turns red, and an optional alert lists everything running low.
+[*][b]Trends:[/b] Small arrows show what went up or down over the last day (the period is adjustable). Counts are recorded hourly and saved with your game, and each resource's history opens from its menu.
+[*][b]Count all on the map:[/b] Count everything lying on the map rather than just what's in storage, for a row, category or group, optionally including what colonists carry.
+[*][b]Hide and search:[/b] Hide rows you don't care about, show zero counts, and filter the list with the search box.
+[*][b]Fold away:[/b] Fold the whole panel to a slim strip when you want the map clear.
+[*][b]Colors:[/b] The low stock, rising and falling colors can be changed in UI Rethemed - Core's theme settings.
+[/list]
+
+[h2]Vanilla UI+ players[/h2]
+Your resource order, moves between categories, hidden rows and count-all choices are brought over the first time this mod starts, and Vanilla UI+ leaves the resource list to this mod.
+
+[h2]Requirements[/h2]
+[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3832843406]UI Rethemed - Core[/url] and Harmony.
+
+[h2]Compatibility[/h2]
+Safe to add to an existing save. Removing it leaves a harmless one-time error about its saved trend history when the save next loads. Other mods that change the resource list, such as Dubs Mint Menus' pinned resources, are replaced by this mod's own panel.
+
+[h2]Credits[/h2]
+Thanks to [b]Lazy Friday Studio[/b] for UI Rethemed and permission to build on it.
