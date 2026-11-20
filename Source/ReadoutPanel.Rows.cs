@@ -120,15 +120,11 @@ public static partial class ReadoutPanel
         }
 
         float countRight = rect.xMax - 4f - (Settings.trends ? ArrowWidth : 0f);
+        DrawCount(row, rect, countRight, out float countLeft);
         if (Settings.showNames)
         {
-            DrawCount(row, rect, countRight, out float countLeft);
             float nameLeft = icon.xMax + 5f;
             Theme.LabelTruncated(new Rect(nameLeft, rect.y, countLeft - 4f - nameLeft, rect.height), row.label, TextAnchor.MiddleLeft, Theme.TextBright);
-        }
-        else
-        {
-            CoreWidgets.Line(new Rect(icon.xMax + 6f, rect.y, countRight - icon.xMax - 6f, rect.height), row.countText, row.low ? LowColor : Theme.TextBright);
         }
 
         if (row.trend != 0)
