@@ -23,9 +23,6 @@ No more columns of unlabeled icons: resources are sorted into groups you recogni
 [*][b]Colors:[/b] The low stock, rising and falling colors can be changed in UI Rethemed - Core's theme settings.
 [/list]
 
-[h2]Vanilla UI+ players[/h2]
-Your resource order, moves between categories, hidden rows and count-all choices are brought over the first time this mod starts, and Vanilla UI+ leaves the resource list to this mod.
-
 [h2]Requirements[/h2]
 [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3832843406]UI Rethemed - Core[/url] and Harmony.
 

@@ -76,13 +76,6 @@ public class ReadoutMod : Mod
             changed = true;
         }
 
-        if (!Settings.importedUiPlus)
-        {
-            Settings.importedUiPlus = true;
-            UiPlusImport.Run();
-            changed = true;
-        }
-
         if (changed)
         {
             Settings.Changed();

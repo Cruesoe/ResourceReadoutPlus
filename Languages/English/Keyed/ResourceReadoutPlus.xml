@@ -143,7 +143,6 @@
   <RRP_SectionCounting>Counting</RRP_SectionCounting>
   <RRP_SectionTrends>Trends</RRP_SectionTrends>
   <RRP_SectionStock>Minimum stock</RRP_SectionStock>
-  <RRP_SectionImport>Vanilla UI+</RRP_SectionImport>
   <RRP_SectionReset>Reset</RRP_SectionReset>
   <RRP_Mode>List</RRP_Mode>
   <RRP_ModeSettingTip>How the readout lists resources. The button on its title bar switches too.</RRP_ModeSettingTip>
@@ -173,12 +172,6 @@
   <RRP_ClearMinimums>Clear all minimum stock ({0})</RRP_ClearMinimums>
   <RRP_ClearMinimumsTip>Removes every minimum stock you set.</RRP_ClearMinimumsTip>
   <RRP_ClearMinimumsConfirm>Remove every minimum stock?</RRP_ClearMinimumsConfirm>
-  <RRP_ImportHint>Vanilla UI+'s resource order, hidden rows and counting choices were brought over the first time this mod started. Bring them over again here.</RRP_ImportHint>
-  <RRP_ImportNow>Bring over from Vanilla UI+</RRP_ImportNow>
-  <RRP_ImportNowTip>Adds Vanilla UI+'s saved resource order, moves, hidden rows and count-all rows to this mod's own.</RRP_ImportNowTip>
-  <RRP_ImportNotFound>No Vanilla UI+ settings were found.</RRP_ImportNotFound>
-  <RRP_Imported>Vanilla UI+'s resource settings were brought over.</RRP_Imported>
-  <RRP_ImportedNothing>Nothing new to bring over from Vanilla UI+.</RRP_ImportedNothing>
   <RRP_ResetOrderTip>Puts every row of this list back in its usual order and place.</RRP_ResetOrderTip>
   <RRP_ResetGroups>Remove your groups and names</RRP_ResetGroups>
   <RRP_ResetGroupsTip>Deletes the groups you made and gives the built-in groups their usual names.</RRP_ResetGroupsTip>

@@ -71,7 +71,6 @@ public class ReadoutSettings : ModSettings
     public List<string> openCategories = new List<string>();
     public List<string> openFamilies = new List<string>();
 
-    public bool importedUiPlus;
 
     // Bumped by every change; caches rebuild on the next read.
     public int version;
@@ -117,7 +116,6 @@ public class ReadoutSettings : ModSettings
         Scribe_Collections.Look(ref foldedGroups, "foldedGroups", LookMode.Value);
         Scribe_Collections.Look(ref openCategories, "openCategories", LookMode.Value);
         Scribe_Collections.Look(ref openFamilies, "openFamilies", LookMode.Value);
-        Scribe_Values.Look(ref importedUiPlus, "importedUiPlus", false);
 
         orderGrouped ??= new List<string>();
         orderSimple ??= new List<string>();

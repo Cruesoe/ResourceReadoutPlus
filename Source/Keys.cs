@@ -10,7 +10,7 @@ public static class Keys
     public const string Group = "G:";
     public const string Family = "F:";
 
-    // Parent key for the categorized top level, as Vanilla UI+ saved it.
+    // Parent key for the categorized top level.
     public const string Top = "TOP";
 
     // Drag lists that aren't a group or category.

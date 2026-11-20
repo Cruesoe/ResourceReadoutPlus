@@ -14,14 +14,13 @@ public static class SettingsPage
     private static readonly Texture2D CountingTex = CoreWidgets.Icon("hash");
     private static readonly Texture2D TrendsTex = CoreWidgets.Icon("chart-line-up");
     private static readonly Texture2D StockTex = CoreWidgets.Icon("warning");
-    private static readonly Texture2D ImportTex = CoreWidgets.Icon("arrow-line-down");
     private static readonly Texture2D ResetTex = CoreWidgets.Icon("arrow-clockwise");
     private static readonly Texture2D ModeTex = CoreWidgets.Icon("rows");
     private static readonly Texture2D OrganizeTex = CoreWidgets.Icon("list-checks");
     private static readonly Texture2D HiddenTex = CoreWidgets.Icon("eye-slash");
 
     // Session lifetime: which cards are open, starting all open.
-    private static readonly List<string> Open = new List<string> { "Organize", "Display", "Counting", "Trends", "Stock", "Import", "Reset" };
+    private static readonly List<string> Open = new List<string> { "Organize", "Display", "Counting", "Trends", "Stock", "Reset" };
     private static SettingsCards? cards;
     private static Vector2 leftScroll;
     private static Vector2 rightScroll;
@@ -66,7 +65,6 @@ public static class SettingsPage
     {
         y = cards!.Card(y, width, "Trends", TrendsTex, "RRP_SectionTrends".Translate(), null, Trends);
         y = cards.Card(y, width, "Stock", StockTex, "RRP_SectionStock".Translate(), null, Stock);
-        y = cards.Card(y, width, "Import", ImportTex, "RRP_SectionImport".Translate(), null, Import);
         y = cards.Card(y, width, "Reset", ResetTex, "RRP_SectionReset".Translate(), null, Reset);
         return y;
     }
@@ -168,17 +166,6 @@ public static class SettingsPage
                 Settings.minimums.Clear();
                 Settings.Changed();
             });
-        }
-    }
-
-    private static void Import(Listing_Standard listing)
-    {
-        bool found = UiPlusImport.SettingsFile() != null;
-        SettingsCards.Hint(listing, "RRP_ImportHint".Translate());
-        if (SettingsCards.ResetButton(listing, "RRP_ImportNow".Translate(), found, "RRP_ImportNowTip".Translate(), "RRP_ImportNotFound".Translate()))
-        {
-            bool any = UiPlusImport.Run();
-            Messages.Message((any ? "RRP_Imported" : "RRP_ImportedNothing").Translate(), RimWorld.MessageTypeDefOf.NeutralEvent, historical: false);
         }
     }
 

@@ -11,4 +11,3 @@ Replaces the resource list at the top left of the map with a panel in the look o
 - Click a row to jump to where it is stored; drag rows to reorder or regroup them.
 - Pin rows to the top, set minimum stock levels with a low-stock alert, view a resource's history, count everything on the map, hide rows and search the list.
 - Small arrows showing what has gone up or down over the last day.
-- Brings over Vanilla UI+'s resource settings, and Vanilla UI+ leaves the resource list to this mod.
