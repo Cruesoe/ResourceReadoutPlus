@@ -27,6 +27,7 @@ public static partial class ReadoutData
     private static int builtSettings = -1;
     private static int builtTrends = -1;
     private static int builtHour = -1;
+    private static int builtMarks = -1;
     private static string builtSearch = "";
     private static float builtAt = -1f;
     private const float CountRebuildDelay = 0.5f;
@@ -35,6 +36,7 @@ public static partial class ReadoutData
     private static readonly List<ThingDef> Resources = new List<ThingDef>();
     private static readonly Dictionary<ThingDef, int> Counts = new Dictionary<ThingDef, int>();
     private static readonly HashSet<string> LowKeys = new HashSet<string>();
+    private static readonly HashSet<string> NearKeys = new HashSet<string>();
     private static readonly Dictionary<string, List<ThingDef>> ByGroup = new Dictionary<string, List<ThingDef>>();
 
     // Settings as sets, rebuilt when settings change.
@@ -62,6 +64,9 @@ public static partial class ReadoutData
         Low.Clear();
         ListUnits.Clear();
         builtMap = null;
+        buildMap = null;
+        TrendMemo.Clear();
+        MatchMemo.Clear();
         search = "";
         ForgetCategorized();
     }
@@ -69,7 +74,8 @@ public static partial class ReadoutData
     public static void Ensure(Map map)
     {
         int hour = Find.TickManager.TicksGame / GenDate.TicksPerHour;
-        bool same = map == builtMap && builtSettings == Settings.version && builtTrends == ResourceTrends.Version && builtHour == hour && builtSearch == search;
+        bool same = map == builtMap && builtSettings == Settings.version && builtTrends == ResourceTrends.Version && builtHour == hour && builtSearch == search
+            && builtMarks == ResourceDiscoveries.Version;
         if (same && builtStamp == ReadoutCounts.Stamp)
         {
             return;
@@ -89,6 +95,7 @@ public static partial class ReadoutData
         builtTrends = ResourceTrends.Version;
         builtHour = hour;
         builtSearch = search;
+        builtMarks = ResourceDiscoveries.Version;
         Build(map);
         Version++;
     }
@@ -179,6 +186,11 @@ public static partial class ReadoutData
         EnsureSets();
         Rows.Clear();
         ListUnits.Clear();
+        TrendMemo.Clear();
+        MatchMemo.Clear();
+        buildMap = map;
+        filtering = Settings.Filtering;
+        sorting = Settings.Sorting;
         ResourceCounter counter = map.resourceCounter;
 
         Resources.Clear();
@@ -286,6 +298,7 @@ public static partial class ReadoutData
     {
         Low.Clear();
         LowKeys.Clear();
+        NearKeys.Clear();
         foreach (KeyValuePair<string, int> entry in Settings.minimums)
         {
             string key = entry.Key;
@@ -320,6 +333,10 @@ public static partial class ReadoutData
             {
                 LowKeys.Add(key);
                 Low.Add(new LowStock { label = label, count = total, minimum = entry.Value });
+            }
+            else if (total < NearLimit(entry.Value))
+            {
+                NearKeys.Add(key);
             }
         }
 
@@ -387,9 +404,21 @@ public static partial class ReadoutData
         return keys;
     }
 
+    // Shown when stocked, set to show at zero or below its minimum; while filtering, shown when it matches instead.
     private static bool Visible(ThingDef def, int count)
     {
-        return !Hidden.Contains(Keys.Of(def)) && (count > 0 || def.resourceReadoutAlwaysShow || (Settings.showZero && def.PlayerAcquirable));
+        string key = Keys.Of(def);
+        if (Hidden.Contains(key))
+        {
+            return false;
+        }
+
+        if (filtering)
+        {
+            return Matches(def);
+        }
+
+        return count > 0 || def.resourceReadoutAlwaysShow || (Settings.showZero && def.PlayerAcquirable) || LowKeys.Contains(key);
     }
 
     private static bool UnitVisible(ReadoutUnit unit)
@@ -399,7 +428,7 @@ public static partial class ReadoutData
             return Visible(unit.def, CountOf(unit.def));
         }
 
-        return !Hidden.Contains(unit.key) && FirstVisible(unit) != null;
+        return !Hidden.Contains(unit.key) && (FirstVisible(unit) != null || (filtering && LowMatch(unit.key)));
     }
 
     private static ThingDef? FirstVisible(ReadoutUnit unit)
@@ -466,16 +495,17 @@ public static partial class ReadoutData
             key = unit.key,
             label = family.LabelCap,
             depth = depth,
-            def = FirstVisible(unit),
+            def = FirstVisible(unit) ?? unit.members[0],
             category = family,
             members = unit.members,
             count = FamilyTotal(family),
             expandable = true,
-            open = OpenFamilies.Contains(unit.key),
+            open = filtering || OpenFamilies.Contains(unit.key),
             low = UnitLow(unit),
             draggable = true,
             list = list,
             unit = unit.key,
+            marked = AnyMarked(unit.members),
         };
         Finish(row);
         Rows.Add(row);
@@ -507,14 +537,17 @@ public static partial class ReadoutData
             draggable = draggable,
             list = list,
             unit = unit,
+            mark = MarkOf(def),
         };
 
-        if (Settings.trends && ResourceTrends.Current is ResourceTrends trends
-            && trends.Change(map, def, row.count, Settings.trendHours * GenDate.TicksPerHour, out int change))
+        TrendInfo trend = TrendOf(def);
+        row.hasChange = trend.has;
+        row.change = trend.change;
+        row.trend = trend.trend;
+        row.ticksLeft = trend.ticksLeft;
+        if (Settings.runOutRow && trend.ticksLeft >= 0 && trend.ticksLeft <= RunOutRowMost)
         {
-            row.hasChange = true;
-            row.change = change;
-            row.trend = Significant(change, row.count - change) ? Math.Sign(change) : 0;
+            row.runOutText = RunOutShort(trend.ticksLeft);
         }
 
         Finish(row);
@@ -531,6 +564,12 @@ public static partial class ReadoutData
     {
         row.countText = Format(row.count);
         row.minimum = Settings.minimums.TryGetValue(row.key, out int minimum) ? minimum : -1;
+        row.near = NearKeys.Contains(row.key);
+        if (filtering || sorting)
+        {
+            row.draggable = false;
+        }
+
         row.tipTitle = () => row.label;
         row.tipBody = () => ReadoutTips.Body(row);
     }
@@ -557,7 +596,10 @@ public static partial class ReadoutData
             if (Keys.ThingOf(key) is ThingDef thing && Counts.ContainsKey(thing))
             {
                 keys.Add(key);
-                AddThing(map, thing, 1, Keys.PinnedList, key, draggable: true);
+                if (!filtering || Settings.pinnedIgnoreFilter || Matches(thing))
+                {
+                    AddThing(map, thing, 1, Keys.PinnedList, key, draggable: true);
+                }
             }
             else if (key.StartsWith(Keys.Family) && Keys.CategoryOf(key) is ThingCategoryDef family)
             {
@@ -573,7 +615,10 @@ public static partial class ReadoutData
                 if (unit.members.Count > 0)
                 {
                     keys.Add(key);
-                    AddPinnedFamily(map, unit);
+                    if (!filtering || Settings.pinnedIgnoreFilter || LowMatch(key) || unit.members.Exists(MatchesDef))
+                    {
+                        AddPinnedFamily(map, unit);
+                    }
                 }
             }
         }
@@ -605,6 +650,7 @@ public static partial class ReadoutData
             draggable = true,
             list = Keys.PinnedList,
             unit = unit.key,
+            marked = AnyMarked(unit.members),
         };
         Finish(row);
         Rows.Add(row);
@@ -625,7 +671,7 @@ public static partial class ReadoutData
         foreach (ThingDef def in Resources)
         {
             int count = CountOf(def);
-            bool shown = count > 0 || def.resourceReadoutAlwaysShow || (Settings.showZero && def.PlayerAcquirable);
+            bool shown = filtering ? Matches(def) : count > 0 || def.resourceReadoutAlwaysShow || (Settings.showZero && def.PlayerAcquirable) || LowKeys.Contains(Keys.Of(def));
             if (shown && def.label != null && def.label.IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 AddThing(map, def, 0, "", Keys.Of(def), draggable: false);
@@ -637,6 +683,7 @@ public static partial class ReadoutData
     {
         List<ReadoutUnit> units = UnitsOf(Resources, ReadoutMode.Simple);
         ListUnits[Keys.SimpleList] = UnitKeys(units);
+        SortByChange(units);
         foreach (ReadoutUnit unit in units)
         {
             if (UnitVisible(unit))
@@ -677,6 +724,7 @@ public static partial class ReadoutData
         List<ThingDef> defs = ByGroup.TryGetValue(group.key, out List<ThingDef>? found) ? found : new List<ThingDef>();
         List<ReadoutUnit> units = UnitsOf(defs, ReadoutMode.Grouped);
         ListUnits[group.rowKey] = UnitKeys(units);
+        SortByChange(units);
 
         Row header = new Row
         {
@@ -687,8 +735,10 @@ public static partial class ReadoutData
             depth = group.depth,
             count = GroupTotal(group),
             expandable = true,
-            open = !FoldedGroups.Contains(group.rowKey),
+            open = filtering || !FoldedGroups.Contains(group.rowKey),
             low = GroupLow(group, 0),
+            marked = GroupMarked(group, 0),
+            chartDefs = ChartDefsOf(group),
             draggable = true,
             list = list,
             unit = group.rowKey,
@@ -714,7 +764,7 @@ public static partial class ReadoutData
     // A group shows when anything inside it shows; the player's own groups show even when empty, so things can be dropped into them.
     private static bool GroupShown(GroupInfo group, int depth)
     {
-        if (group.custom || LowKeys.Contains(group.rowKey))
+        if (filtering ? LowMatch(group.rowKey) : group.custom || LowKeys.Contains(group.rowKey))
         {
             return true;
         }

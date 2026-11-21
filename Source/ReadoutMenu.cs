@@ -26,6 +26,8 @@ public static class ReadoutMenu
     private static readonly Texture2D SettingsTex = CoreWidgets.Icon("gear-six");
     private static readonly Texture2D OrganizeTex = CoreWidgets.Icon("list-checks");
     private static readonly Texture2D TopTex = CoreWidgets.Icon("arrow-line-up");
+    private static readonly Texture2D FilterTex = CoreWidgets.Icon("funnel");
+    private static readonly Texture2D SeenTex = CoreWidgets.Icon("check");
 
     private static ReadoutSettings Settings => ReadoutMod.Settings;
 
@@ -76,6 +78,12 @@ public static class ReadoutMenu
         }));
 
         section.items.Add(Item("RRP_SetMinimum", MinimumTex, () => Find.WindowStack.Add(new Dialog_MinimumStock(row.key, row.label))));
+
+        if (row.kind == RowKind.Item && row.def != null && row.mark != ResourceDiscoveries.None)
+        {
+            ThingDef def = row.def;
+            section.items.Add(Item("RRP_MarkSeen", SeenTex, () => MarkSeen(def)));
+        }
 
         if (row.kind == RowKind.Item && row.def != null)
         {
@@ -185,6 +193,11 @@ public static class ReadoutMenu
         if (Settings.mode == ReadoutMode.Grouped)
         {
             section.items.Add(Item("RRP_NewGroup", NewTex, () => Find.WindowStack.Add(new Dialog_GroupName("RRP_NewGroupTitle".Translate(), "", label => ReadoutGroups.NewGroup(label)))));
+        }
+
+        if (AnyMarks())
+        {
+            section.items.Add(Item("RRP_MarkAllSeen", SeenTex, MarkAllSeen));
         }
 
         if (Settings.hidden.Count > 0)
@@ -392,6 +405,88 @@ public static class ReadoutMenu
     private static ChoiceItem Item(string key, Texture icon, System.Action action)
     {
         return new ChoiceItem { label = key.Translate(), icon = icon, action = action };
+    }
+
+    // ---- Filter menu, from the title bar --------------------------------------------------
+
+    public static void OpenFilter()
+    {
+        Find.WindowStack.Add(new ChoiceMenu("RRP_FilterTitle".Translate(), FilterTex, FilterSections));
+    }
+
+    private static List<ChoiceSection> FilterSections()
+    {
+        ChoiceSection kinds = new ChoiceSection { title = "RRP_FilterShowOnly".Translate() };
+        ChoiceItem all = Item("RRP_FilterAll", ShowTex, () =>
+        {
+            Settings.filtering = false;
+            Settings.Changed();
+        });
+        all.on = !Settings.Filtering;
+        all.tip = "RRP_FilterAllTip".Translate();
+        kinds.items.Add(all);
+        kinds.items.Add(FilterTick(ShowFilter.Trending, Settings.trends, "RRP_NeedsTrends"));
+        kinds.items.Add(FilterTick(ShowFilter.Falling, Settings.trends, "RRP_NeedsTrends"));
+        kinds.items.Add(FilterTick(ShowFilter.Low, true, null));
+        kinds.items.Add(FilterTick(ShowFilter.New, Settings.newMarks, "RRP_NeedsNewMarks"));
+
+        ChoiceSection options = new ChoiceSection { title = "RRP_FilterOptions".Translate() };
+        options.items.Add(Tick("RRP_PinnedIgnoreFilter", Settings.pinnedIgnoreFilter, () => Settings.pinnedIgnoreFilter = !Settings.pinnedIgnoreFilter));
+        ChoiceItem sort = Tick("RRP_SortByChange", Settings.Sorting, () => Settings.sortByChange = !Settings.sortByChange);
+        if (!Settings.trends)
+        {
+            sort.enabled = false;
+            sort.tip = "RRP_NeedsTrends".Translate();
+        }
+
+        options.items.Add(sort);
+        if (AnyMarks())
+        {
+            options.items.Add(Item("RRP_MarkAllSeen", SeenTex, MarkAllSeen));
+        }
+
+        return new List<ChoiceSection> { kinds, options };
+    }
+
+    // One filter kind; ticking it also switches the filter on.
+    private static ChoiceItem FilterTick(ShowFilter kind, bool available, string? needs)
+    {
+        string key = "RRP_Filter_" + kind;
+        return new ChoiceItem
+        {
+            label = key.Translate(),
+            tick = true,
+            on = available && (Settings.filters & kind) != 0,
+            enabled = available,
+            tip = available || needs == null ? (key + "Tip").Translate() : needs.Translate(),
+            action = () =>
+            {
+                Settings.filters ^= kind;
+                Settings.filtering = Settings.filters != ShowFilter.None;
+                Settings.Changed();
+            },
+        };
+    }
+
+    private static bool AnyMarks()
+    {
+        return Find.CurrentMap is Map map && ResourceDiscoveries.Current is ResourceDiscoveries discoveries && discoveries.AnyMarks(map);
+    }
+
+    private static void MarkSeen(ThingDef def)
+    {
+        if (Find.CurrentMap is Map map)
+        {
+            ResourceDiscoveries.Current?.Clear(map, def);
+        }
+    }
+
+    private static void MarkAllSeen()
+    {
+        if (Find.CurrentMap is Map map)
+        {
+            ResourceDiscoveries.Current?.ClearAll(map);
+        }
     }
 
     private static ChoiceItem Tick(string key, bool on, System.Action flip)

@@ -17,6 +17,34 @@
   <RRP_MoveIntoItself>A category can't be moved inside itself.</RRP_MoveIntoItself>
   <RRP_NoneToJumpTo>No {0} to jump to.</RRP_NoneToJumpTo>
 
+  <!-- Filter -->
+  <RRP_FilterTitle>Filter</RRP_FilterTitle>
+  <RRP_FilterTip>Show only some resources: trending, falling, low stock or new. Set a key for switching the filter on and off in the game's keyboard settings.</RRP_FilterTip>
+  <RRP_FilterTipKey>Show only some resources: trending, falling, low stock or new. Press {0} to switch the filter on and off.</RRP_FilterTipKey>
+  <RRP_FilterEmpty>Nothing matches the filter.</RRP_FilterEmpty>
+  <RRP_FilterShowOnly>Show only</RRP_FilterShowOnly>
+  <RRP_FilterAll>Show everything</RRP_FilterAll>
+  <RRP_FilterAllTip>Switches the filter off. The kinds you chose are kept for next time.</RRP_FilterAllTip>
+  <RRP_Filter_Trending>Trending</RRP_Filter_Trending>
+  <RRP_Filter_TrendingTip>Resources with an up or down arrow: changed noticeably over the trend period.</RRP_Filter_TrendingTip>
+  <RRP_Filter_Falling>Falling</RRP_Filter_Falling>
+  <RRP_Filter_FallingTip>Resources with a down arrow: fell noticeably over the trend period.</RRP_Filter_FallingTip>
+  <RRP_Filter_Low>Low stock</RRP_Filter_Low>
+  <RRP_Filter_LowTip>Resources and groups below their minimum stock, or close above it. Nothing has a minimum until you set one from its right-click menu.</RRP_Filter_LowTip>
+  <RRP_Filter_New>New</RRP_Filter_New>
+  <RRP_Filter_NewTip>Resources marked new or back in stock.</RRP_Filter_NewTip>
+  <RRP_FilterOptions>Options</RRP_FilterOptions>
+  <RRP_PinnedIgnoreFilter>Pinned rows always show</RRP_PinnedIgnoreFilter>
+  <RRP_PinnedIgnoreFilterTip>Pinned rows stay on show while the filter is on. Untick to filter them like any other row.</RRP_PinnedIgnoreFilterTip>
+  <RRP_SortByChange>Sort by change</RRP_SortByChange>
+  <RRP_SortByChangeTip>Within each group, the resources that changed most over the trend period come first. Rows can't be dragged while this is on.</RRP_SortByChangeTip>
+  <RRP_NeedsTrends>Needs Show trends, in the mod settings.</RRP_NeedsTrends>
+  <RRP_NeedsNewMarks>Needs Mark new resources, in the mod settings.</RRP_NeedsNewMarks>
+  <RRP_MarkSeen>Mark as seen</RRP_MarkSeen>
+  <RRP_MarkAllSeen>Mark everything as seen</RRP_MarkAllSeen>
+  <RRP_DaysShort>{0}d</RRP_DaysShort>
+  <RRP_HoursShort>{0}h</RRP_HoursShort>
+
   <!-- Groups -->
   <RRP_Group_Essentials>Essentials</RRP_Group_Essentials>
   <RRP_Group_Meat>Meat and fish</RRP_Group_Meat>
@@ -52,6 +80,13 @@
   <RRP_TipTotal>Total: {0}</RRP_TipTotal>
   <RRP_TipMinimum>Minimum stock: {0}</RRP_TipMinimum>
   <RRP_TipBelowMinimum>Below the minimum stock of {0}.</RRP_TipBelowMinimum>
+  <RRP_TipNearMinimum>Close to the minimum stock of {0}.</RRP_TipNearMinimum>
+  <RRP_TipRunOut>Runs out in about {0} at the current rate.</RRP_TipRunOut>
+  <RRP_TipNew>New: stored for the first time this game. Click the row to clear the mark.</RRP_TipNew>
+  <RRP_TipBack>Back in stock after running out. Click the row to clear the mark.</RRP_TipBack>
+  <RRP_TipNewInside>Holds new or back-in-stock resources.</RRP_TipNewInside>
+  <RRP_ChartCaption>Last {0} days</RRP_ChartCaption>
+  <RRP_ChartRange>{0} to {1}</RRP_ChartRange>
   <RRP_TipItemHelp>Click to jump to where it is stored, again for the next stack. Drag to move it. Right-click for options.</RRP_TipItemHelp>
   <RRP_TipGroupHelp>Click to open or close. Drag to move it. Right-click for options.</RRP_TipGroupHelp>
   <RRP_TipMenuHelp>Right-click for options.</RRP_TipMenuHelp>
@@ -142,6 +177,8 @@
   <RRP_SectionDisplay>Display</RRP_SectionDisplay>
   <RRP_SectionCounting>Counting</RRP_SectionCounting>
   <RRP_SectionTrends>Trends</RRP_SectionTrends>
+  <RRP_SectionFilter>Filter</RRP_SectionFilter>
+  <RRP_SectionNew>New resources</RRP_SectionNew>
   <RRP_SectionStock>Minimum stock</RRP_SectionStock>
   <RRP_SectionReset>Reset</RRP_SectionReset>
   <RRP_Mode>List</RRP_Mode>
@@ -167,6 +204,26 @@
   <RRP_TrendHours>Trend period</RRP_TrendHours>
   <RRP_TrendHoursTip>The arrows compare the count now with the count this long ago.</RRP_TrendHoursTip>
   <RRP_Hours>{0} hours</RRP_Hours>
+  <RRP_Days>{0} days</RRP_Days>
+  <RRP_HoverChart>Chart in tooltips</RRP_HoverChart>
+  <RRP_HoverChartTip>Hovering a row shows a small chart of its count over the last few days, from the hourly records. Groups, categories and combined look-alikes chart their totals.</RRP_HoverChartTip>
+  <RRP_ChartDays>Chart length</RRP_ChartDays>
+  <RRP_ChartDaysTip>How many days the tooltip chart covers. Up to ten days are recorded.</RRP_ChartDaysTip>
+  <RRP_RunOutInTooltip>Run-out estimate in tooltips</RRP_RunOutInTooltip>
+  <RRP_RunOutInTooltipTip>For resources that are falling, the tooltip says roughly when they run out if they keep falling at the rate of the trend period.</RRP_RunOutInTooltipTip>
+  <RRP_RunOutRow>Run-out estimate beside the count</RRP_RunOutRow>
+  <RRP_RunOutRowTip>Shows the run-out estimate, such as 2.5d, beside the count of resources that would run out within ten days.</RRP_RunOutRowTip>
+  <RRP_FilterHint>The funnel on the readout's title bar switches the filter. Rows matching any ticked kind show; groups and look-alikes open to show them.</RRP_FilterHint>
+  <RRP_Filtering>Filter on</RRP_Filtering>
+  <RRP_FilteringTip>Applies the filter now. The title bar button and the hotkey switch it too.</RRP_FilteringTip>
+  <RRP_NearPercent>Close to the minimum</RRP_NearPercent>
+  <RRP_NearPercentTip>The low stock filter also shows rows less than this far above their minimum. At 0% it shows only rows below their minimum.</RRP_NearPercentTip>
+  <RRP_NewMarks>Mark new resources</RRP_NewMarks>
+  <RRP_NewMarksTip>Marks a resource the first time it is stored this game. Starting stock, a new map's first day and saves from before this option aren't marked. Clicking the row clears its mark.</RRP_NewMarksTip>
+  <RRP_BackInStock>Mark resources back in stock</RRP_BackInStock>
+  <RRP_BackInStockTip>Marks a resource that ran out on this map for at least a day and is stored again.</RRP_BackInStockTip>
+  <RRP_NewHours>Keep marks for</RRP_NewHours>
+  <RRP_NewHoursTip>How long a mark stays before it clears itself.</RRP_NewHoursTip>
   <RRP_LowStockAlertSetting>Low stock alert</RRP_LowStockAlertSetting>
   <RRP_LowStockAlertSettingTip>Shows an alert listing every resource below the minimum stock you set for it. No resource has a minimum until you set one from its right-click menu.</RRP_LowStockAlertSettingTip>
   <RRP_ClearMinimums>Clear all minimum stock ({0})</RRP_ClearMinimums>

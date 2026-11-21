@@ -15,6 +15,10 @@ public static partial class ReadoutPanel
     private static Color LowColor => Theme.ModColor(PackageId, "Low");
     private static Color RisingColor => Theme.ModColor(PackageId, "Rising");
     private static Color FallingColor => Theme.ModColor(PackageId, "Falling");
+    private static Color NewColor => Theme.ModColor(PackageId, "New");
+
+    private static readonly Texture2D NewTex = CoreWidgets.Icon("sparkle");
+    private static readonly Texture2D BackTex = CoreWidgets.Icon("arrow-counter-clockwise");
 
     private static void DrawRow(Row row, Rect rect, int index)
     {
@@ -43,7 +47,14 @@ public static partial class ReadoutPanel
         GUI.color = Color.white;
         if (!dragging && interactive && row.tipBody != null)
         {
-            CoreWidgets.LazyTip(rect, row.tipTitle, row.tipBody);
+            if (Settings.hoverChart && Settings.trends && row.kind != RowKind.Header)
+            {
+                ResourceTipCard.Region(rect, row);
+            }
+            else
+            {
+                CoreWidgets.LazyTip(rect, row.tipTitle, row.tipBody);
+            }
         }
     }
 
@@ -83,6 +94,7 @@ public static partial class ReadoutPanel
 
         float countRight = rect.xMax - 4f - (Settings.trends ? ArrowWidth : 0f);
         DrawCount(row, rect, countRight, out float countLeft);
+        countLeft = DrawExtras(row, rect, countLeft);
         if (Settings.showNames)
         {
             float nameLeft = icon.xMax + 6f;
@@ -105,6 +117,10 @@ public static partial class ReadoutPanel
         {
             Rounded.Fill(rect.ContractedBy(1f), Faces.Fade(LowColor, 0.18f));
         }
+        else if (row.mark != ResourceDiscoveries.None)
+        {
+            Rounded.Fill(rect.ContractedBy(1f), Faces.Fade(NewColor, 0.16f));
+        }
 
         if (row.kind == RowKind.Family)
         {
@@ -119,8 +135,15 @@ public static partial class ReadoutPanel
             GUI.color = Color.white;
         }
 
+        if (row.mark != ResourceDiscoveries.None)
+        {
+            Rect badge = new Rect(icon.xMax - 8f, icon.y - 3f, 12f, 12f);
+            CoreWidgets.DrawIcon(badge, row.mark == ResourceDiscoveries.New ? NewTex : BackTex, NewColor, 12f);
+        }
+
         float countRight = rect.xMax - 4f - (Settings.trends ? ArrowWidth : 0f);
         DrawCount(row, rect, countRight, out float countLeft);
+        countLeft = DrawExtras(row, rect, countLeft);
         if (Settings.showNames)
         {
             float nameLeft = icon.xMax + 5f;
@@ -132,6 +155,29 @@ public static partial class ReadoutPanel
             Rect marker = new Rect(rect.xMax - 4f - ArrowWidth + 1f, Mathf.Round(rect.center.y - 4f), 8f, 8f);
             CoreWidgets.TrendArrow(marker, row.trend > 0, row.trend > 0 ? RisingColor : FallingColor);
         }
+    }
+
+    // Left of the count: the run-out estimate, and a dot when something inside a header or family is new. Returns the new left edge.
+    private static float DrawExtras(Row row, Rect rect, float left)
+    {
+        if (row.runOutText != null)
+        {
+            if (row.runOutWidth < 0f)
+            {
+                row.runOutWidth = CoreWidgets.Width(row.runOutText) + 2f;
+            }
+
+            left -= row.runOutWidth + 4f;
+            CoreWidgets.Line(new Rect(left, rect.y, row.runOutWidth, rect.height), row.runOutText, FallingColor, GameFont.Small, TextAnchor.MiddleRight);
+        }
+
+        if (row.marked && row.kind != RowKind.Item)
+        {
+            left -= 10f;
+            Rounded.Circle(new Vector2(left + 3f, rect.center.y), 3f, NewColor);
+        }
+
+        return left;
     }
 
     // Draws the count right-aligned at countRight; countLeft is where it starts.

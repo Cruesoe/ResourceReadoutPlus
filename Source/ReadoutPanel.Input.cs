@@ -107,6 +107,17 @@ public static partial class ReadoutPanel
 
     private static void Click(Row row)
     {
+        if (row.kind == RowKind.Item && row.def != null && row.mark != ResourceDiscoveries.None)
+        {
+            ResourceDiscoveries.Current?.Clear(Find.CurrentMap, row.def);
+        }
+
+        // The filter shows everything inside headers and families open, so clicking them does nothing while it is on.
+        if (S.Filtering && row.kind != RowKind.Item)
+        {
+            return;
+        }
+
         switch (row.kind)
         {
             case RowKind.Group:

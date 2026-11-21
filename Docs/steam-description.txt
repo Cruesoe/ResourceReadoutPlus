@@ -16,18 +16,22 @@ No more columns of unlabeled icons: resources are sorted into groups you recogni
 [*][b]Pinned rows:[/b] Keep the resources you watch most at the top.
 [*][b]Minimum stock:[/b] Off until you want it: set a minimum on any row, group or category. Below it the row turns red, and an optional alert lists everything running low.
 [*][b]Trends:[/b] Small arrows show what went up or down over the last day (the period is adjustable). Counts are recorded hourly and saved with your game, and each resource's history opens from its menu.
+[*][b]Charts and run-out estimates:[/b] Hover a row for a small chart of its count over the last few days; groups chart their totals. Falling resources say roughly when they'll run out, in the tooltip or beside the count.
+[*][b]Filter:[/b] Show only what's trending, falling, low (or close to its minimum) or new, from the funnel on the title bar or a hotkey you set. Groups open to show what matches, and pinned rows can stay on show.
+[*][b]Sort by change:[/b] Put the resources that moved most at the top of each group.
+[*][b]New resources:[/b] Resources stored for the first time get a mark, and so can ones back in stock after running out. Marks clear themselves after a day (adjustable) or when you click the row.
 [*][b]Count all on the map:[/b] Count everything lying on the map rather than just what's in storage, for a row, category or group, optionally including what colonists carry.
 [*][b]Hide and search:[/b] Hide rows you don't care about, show zero counts, and filter the list with the search box.
 [*][b]Settings cog and opacity:[/b] A cog on the panel opens the settings, where a slider sets how solid the background is.
 [*][b]Fold away:[/b] Fold the whole panel to a slim strip when you want the map clear.
-[*][b]Colors:[/b] The low stock, rising and falling colors can be changed in UI Rethemed - Core's theme settings.
+[*][b]Colors:[/b] The low stock, rising, falling and new colors can be changed in UI Rethemed - Core's theme settings.
 [/list]
 
 [h2]Requirements[/h2]
 [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3832843406]UI Rethemed - Core[/url] and Harmony.
 
 [h2]Compatibility[/h2]
-Safe to add to an existing save. Removing it leaves a harmless one-time error about its saved trend history when the save next loads. Other mods that change the resource list, such as Dubs Mint Menus' pinned resources, are replaced by this mod's own panel.
+Safe to add to an existing save. Removing it leaves harmless one-time errors about its saved trend history and new-resource records when the save next loads. Other mods that change the resource list, such as Dubs Mint Menus' pinned resources, are replaced by this mod's own panel.
 
 [h2]Credits[/h2]
 Thanks to [b]Lazy Friday Studio[/b] for UI Rethemed and permission to build on it.

@@ -12,6 +12,14 @@ public class ReadoutSettings : ModSettings
     public const int MaxTrendHours = 120;
     public const int UsualTrendHours = 24;
     public const float MinOpacity = 0.1f;
+    public const int MinChartDays = 1;
+    public const int MaxChartDays = 10;
+    public const int UsualChartDays = 5;
+    public const int MinNewHours = 1;
+    public const int MaxNewHours = 240;
+    public const int UsualNewHours = 24;
+    public const int MaxNearPercent = 100;
+    public const int UsualNearPercent = 25;
 
     // Matches the background of UI Rethemed - Notifications' alert and message rows.
     public const float DefaultOpacity = 0.6f;
@@ -36,6 +44,22 @@ public class ReadoutSettings : ModSettings
     public bool trends = true;
     public int trendHours = UsualTrendHours;
     public bool lowStockAlert = true;
+    public bool hoverChart = true;
+    public int chartDays = UsualChartDays;
+    public bool runOutTip = true;
+    public bool runOutRow;
+
+    // Filter: the kinds chosen, whether it is on, and how it treats pinned rows and rows close to their minimum.
+    public ShowFilter filters;
+    public bool filtering;
+    public bool pinnedIgnoreFilter = true;
+    public int nearPercent = UsualNearPercent;
+    public bool sortByChange;
+
+    // New and back-in-stock marks.
+    public bool newMarks = true;
+    public bool backInStock = true;
+    public int newHours = UsualNewHours;
 
     // Order per mode: saved keys ranked in order; unranked rows follow in the base game's order.
     public List<string> orderGrouped = new List<string>();
@@ -95,6 +119,18 @@ public class ReadoutSettings : ModSettings
         Scribe_Values.Look(ref trends, "trends", true);
         Scribe_Values.Look(ref trendHours, "trendHours", UsualTrendHours);
         Scribe_Values.Look(ref lowStockAlert, "lowStockAlert", true);
+        Scribe_Values.Look(ref hoverChart, "hoverChart", true);
+        Scribe_Values.Look(ref chartDays, "chartDays", UsualChartDays);
+        Scribe_Values.Look(ref runOutTip, "runOutTip", true);
+        Scribe_Values.Look(ref runOutRow, "runOutRow", false);
+        Scribe_Values.Look(ref filters, "filters", ShowFilter.None);
+        Scribe_Values.Look(ref filtering, "filtering", false);
+        Scribe_Values.Look(ref pinnedIgnoreFilter, "pinnedIgnoreFilter", true);
+        Scribe_Values.Look(ref nearPercent, "nearPercent", UsualNearPercent);
+        Scribe_Values.Look(ref sortByChange, "sortByChange", false);
+        Scribe_Values.Look(ref newMarks, "newMarks", true);
+        Scribe_Values.Look(ref backInStock, "backInStock", true);
+        Scribe_Values.Look(ref newHours, "newHours", UsualNewHours);
 
         Scribe_Collections.Look(ref orderGrouped, "orderGrouped", LookMode.Value);
         Scribe_Collections.Look(ref orderSimple, "orderSimple", LookMode.Value);
@@ -136,6 +172,12 @@ public class ReadoutSettings : ModSettings
         openFamilies ??= new List<string>();
         version++;
     }
+
+    // The filter is applied: switched on with at least one kind chosen.
+    public bool Filtering => filtering && filters != ShowFilter.None;
+
+    // Rows are sorted by how much they changed (needs trends).
+    public bool Sorting => sortByChange && trends;
 
     public List<string> OrderFor(ReadoutMode readoutMode)
     {

@@ -12,5 +12,6 @@ public static class Patch_MemoryUtility_ClearAllMapsAndWorld
         ReadoutCounts.Forget();
         ReadoutJump.Forget();
         ReadoutPanel.Forget();
+        ResourceTipCard.Forget();
     }
 }

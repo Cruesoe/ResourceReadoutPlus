@@ -10,4 +10,6 @@ Replaces the resource list at the top left of the map with a panel in the look o
 - Item names, row tooltips with storage, map-wide counts, value and recent change.
 - Click a row to jump to where it is stored; drag rows to reorder or regroup them.
 - Pin rows to the top, set minimum stock levels with a low-stock alert, view a resource's history, count everything on the map, hide rows and search the list.
-- Small arrows showing what has gone up or down over the last day.
+- Small arrows showing what has gone up or down over the last day, a chart of the last few days in each row's tooltip and an estimate of when falling resources run out.
+- A filter that shows only trending, falling, low-stock or new resources, switched from the title bar or a hotkey, and an option to sort rows by how much they changed.
+- Marks on resources stored for the first time, or back in stock after running out, that clear themselves after a while or when clicked.

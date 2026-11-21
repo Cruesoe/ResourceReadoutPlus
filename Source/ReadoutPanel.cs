@@ -27,6 +27,7 @@ public static partial class ReadoutPanel
 
     private static readonly Texture2D TitleTex = CoreWidgets.Icon("stack");
     private static readonly Texture2D SearchTex = CoreWidgets.Icon("magnifying-glass");
+    private static readonly Texture2D FilterTex = CoreWidgets.Icon("funnel");
     private static readonly Texture2D SettingsTex = CoreWidgets.Icon("gear-six");
     private static readonly Texture2D GroupedTex = CoreWidgets.Icon("squares-four");
     private static readonly Texture2D SimpleTex = CoreWidgets.Icon("list");
@@ -52,6 +53,10 @@ public static partial class ReadoutPanel
     private static string? empty;
     private static string? settingsTitle;
     private static string? settingsTip;
+    private static string? filterTitle;
+    private static string? filterEmpty;
+    private static string? filterTip;
+    private static string? filterTipFor;
     private static readonly Dictionary<ReadoutMode, string> ModeTips = new Dictionary<ReadoutMode, string>();
     private static LoadedLanguage? textLanguage;
 
@@ -115,6 +120,9 @@ public static partial class ReadoutPanel
         empty = "RRP_Empty".Translate();
         settingsTitle = "RRP_OpenSettings".Translate();
         settingsTip = "RRP_OpenSettingsTip".Translate();
+        filterTitle = "RRP_FilterTitle".Translate();
+        filterEmpty = "RRP_FilterEmpty".Translate();
+        filterTipFor = null;
         ModeTips.Clear();
         foreach (ReadoutMode mode in Enum.GetValues(typeof(ReadoutMode)))
         {
@@ -150,6 +158,7 @@ public static partial class ReadoutPanel
     private static void DrawPanel()
     {
         Translate();
+        FilterKey();
         Map map = Find.CurrentMap;
         ReadoutData.Ensure(map);
         interactive = !Find.WindowStack.MouseObscuredNow;
@@ -168,7 +177,7 @@ public static partial class ReadoutPanel
         CoreWidgets.SurfaceAlpha = Opacity;
         try
         {
-            bool open = SidePanel.Begin(panelRect, title, TitleTex, ref folded, SidePanel.Side.Left, out Rect inner, out Rect titleBar, out float right, tools: 96f);
+            bool open = SidePanel.Begin(panelRect, title, TitleTex, ref folded, SidePanel.Side.Left, out Rect inner, out Rect titleBar, out float right, tools: 128f);
             if (folded != Settings.folded)
             {
                 Settings.folded = folded;
@@ -215,6 +224,11 @@ public static partial class ReadoutPanel
             Settings.Changed();
         }
 
+        if (CoreWidgets.TitleTool(titleBar, ref right, FilterTex, filterTitle, FilterTip(), on: Settings.Filtering))
+        {
+            ReadoutMenu.OpenFilter();
+        }
+
         if (CoreWidgets.TitleTool(titleBar, ref right, SearchTex, searchHint, searchTip, on: searching))
         {
             searching = !searching;
@@ -227,6 +241,39 @@ public static partial class ReadoutPanel
                 Failsafe.Later(() => GUI.FocusControl(SearchControl));
             }
         }
+    }
+
+    // The filter button's tooltip, naming the hotkey; rebuilt when the binding changes.
+    private static string FilterTip()
+    {
+        string key = ReadoutDefOf.RRP_ToggleFilter.MainKeyLabel;
+        if (filterTip == null || filterTipFor != key)
+        {
+            filterTipFor = key;
+            filterTip = ReadoutDefOf.RRP_ToggleFilter.MainKey == KeyCode.None ? "RRP_FilterTip".Translate() : "RRP_FilterTipKey".Translate(key);
+        }
+
+        return filterTip;
+    }
+
+    // The hotkey switches between the full list and the chosen filter; with no filter chosen it opens the filter menu.
+    private static void FilterKey()
+    {
+        if (Event.current.type != EventType.KeyDown || GUIUtility.keyboardControl != 0 || !ReadoutDefOf.RRP_ToggleFilter.KeyDownEvent)
+        {
+            return;
+        }
+
+        Event.current.Use();
+        if (Settings.filters == ShowFilter.None)
+        {
+            ReadoutMenu.OpenFilter();
+            return;
+        }
+
+        Settings.filtering = !Settings.filtering;
+        scroll = Vector2.zero;
+        Settings.Changed();
     }
 
     private static void DrawBody(Rect inner, List<Row> rows)
@@ -242,7 +289,7 @@ public static partial class ReadoutPanel
         outRect = body;
         if (rows.Count == 0)
         {
-            CoreWidgets.Empty(body, empty);
+            CoreWidgets.Empty(body, Settings.Filtering ? filterEmpty : empty);
             return;
         }
 

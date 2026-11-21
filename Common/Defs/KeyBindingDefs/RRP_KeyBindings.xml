@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <!-- Unbound by default, so it never takes a key another binding uses. -->
+  <KeyBindingDef>
+    <defName>RRP_ToggleFilter</defName>
+    <label>switch the resource readout's filter on or off</label>
+    <category>Game</category>
+    <defaultKeyCodeA>None</defaultKeyCodeA>
+  </KeyBindingDef>
+</Defs>
