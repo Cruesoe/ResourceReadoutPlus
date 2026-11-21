@@ -19,6 +19,11 @@ public static partial class ReadoutPanel
     private const float Top = 7f;
     private const float BottomRoom = 200f;
     private const float NarrowWidth = 150f;
+
+    // Title bar room: three 32 px tools, the fold button and the title icon with its margin.
+    private const float ToolsWidth = 96f;
+    private const float FoldRoom = 32f;
+    private const float IconRoom = 32f;
     private const float FoldedHeight = 70f;
     private const float TitleHeight = 30f;
     private const float SearchHeight = 28f;
@@ -57,7 +62,6 @@ public static partial class ReadoutPanel
     private static string? filterEmpty;
     private static string? filterTip;
     private static string? filterTipFor;
-    private static readonly Dictionary<ReadoutMode, string> ModeTips = new Dictionary<ReadoutMode, string>();
     private static LoadedLanguage? textLanguage;
 
     private static ReadoutSettings Settings => ReadoutMod.Settings;
@@ -118,16 +122,11 @@ public static partial class ReadoutPanel
         searchHint = "RRP_SearchHint".Translate();
         searchTip = "RRP_SearchTip".Translate();
         empty = "RRP_Empty".Translate();
-        settingsTitle = "RRP_OpenSettings".Translate();
-        settingsTip = "RRP_OpenSettingsTip".Translate();
+        settingsTitle = "RRP_PanelMenu".Translate();
+        settingsTip = "RRP_PanelMenuTip".Translate();
         filterTitle = "RRP_FilterTitle".Translate();
         filterEmpty = "RRP_FilterEmpty".Translate();
         filterTipFor = null;
-        ModeTips.Clear();
-        foreach (ReadoutMode mode in Enum.GetValues(typeof(ReadoutMode)))
-        {
-            ModeTips[mode] = "RRP_ModeTip".Translate(ModeLabel(mode), ModeLabel(NextMode(mode)));
-        }
     }
 
     public static string ModeLabel(ReadoutMode mode)
@@ -135,17 +134,14 @@ public static partial class ReadoutPanel
         return ("RRP_Mode_" + mode).Translate();
     }
 
-    private static ReadoutMode NextMode(ReadoutMode mode)
+    public static void SetMode(ReadoutMode mode)
     {
-        return mode switch
-        {
-            ReadoutMode.Grouped => ReadoutMode.Simple,
-            ReadoutMode.Simple => ReadoutMode.Categorized,
-            _ => ReadoutMode.Grouped,
-        };
+        Settings.mode = mode;
+        scroll = Vector2.zero;
+        Settings.Changed();
     }
 
-    private static Texture2D ModeIcon(ReadoutMode mode)
+    public static Texture2D ModeIcon(ReadoutMode mode)
     {
         return mode switch
         {
@@ -177,7 +173,9 @@ public static partial class ReadoutPanel
         CoreWidgets.SurfaceAlpha = Opacity;
         try
         {
-            bool open = SidePanel.Begin(panelRect, title, TitleTex, ref folded, SidePanel.Side.Left, out Rect inner, out Rect titleBar, out float right, tools: 128f);
+            // The title icon only when the tools leave room for it; the folded strip always has it.
+            Texture2D? icon = folded || width - FoldRoom - ToolsWidth >= IconRoom ? TitleTex : null;
+            bool open = SidePanel.Begin(panelRect, title, icon, ref folded, SidePanel.Side.Left, out Rect inner, out Rect titleBar, out float right, tools: ToolsWidth);
             if (folded != Settings.folded)
             {
                 Settings.folded = folded;
@@ -214,14 +212,7 @@ public static partial class ReadoutPanel
     {
         if (CoreWidgets.TitleTool(titleBar, ref right, SettingsTex, settingsTitle, settingsTip))
         {
-            Failsafe.Later(() => Find.WindowStack.Add(new Dialog_ModSettings(ReadoutMod.Instance)));
-        }
-
-        if (CoreWidgets.TitleTool(titleBar, ref right, ModeIcon(Settings.mode), ModeLabel(Settings.mode), ModeTips[Settings.mode]))
-        {
-            Settings.mode = NextMode(Settings.mode);
-            scroll = Vector2.zero;
-            Settings.Changed();
+            ReadoutMenu.OpenPanel();
         }
 
         if (CoreWidgets.TitleTool(titleBar, ref right, FilterTex, filterTitle, FilterTip(), on: Settings.Filtering))

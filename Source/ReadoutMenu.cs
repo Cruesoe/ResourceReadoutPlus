@@ -407,6 +407,32 @@ public static class ReadoutMenu
         return new ChoiceItem { label = key.Translate(), icon = icon, action = action };
     }
 
+    // ---- Panel menu, from the title bar cog ------------------------------------------------
+
+    public static void OpenPanel()
+    {
+        Find.WindowStack.Add(new ChoiceMenu("RRP_PanelMenu".Translate(), SettingsTex, () => new List<ChoiceSection> { ModeRows(), ReadoutRows() }));
+    }
+
+    private static ChoiceSection ModeRows()
+    {
+        ChoiceSection section = new ChoiceSection { title = "RRP_Mode".Translate() };
+        foreach (ReadoutMode mode in System.Enum.GetValues(typeof(ReadoutMode)))
+        {
+            ReadoutMode captured = mode;
+            section.items.Add(new ChoiceItem
+            {
+                label = ReadoutPanel.ModeLabel(mode).CapitalizeFirst(),
+                icon = ReadoutPanel.ModeIcon(mode),
+                tip = ("RRP_Mode_" + mode + "Tip").Translate(),
+                on = Settings.mode == mode,
+                action = () => ReadoutPanel.SetMode(captured),
+            });
+        }
+
+        return section;
+    }
+
     // ---- Filter menu, from the title bar --------------------------------------------------
 
     public static void OpenFilter()

@@ -7,7 +7,6 @@
   <RRP_Pinned>Pinned</RRP_Pinned>
   <RRP_SearchHint>Search resources</RRP_SearchHint>
   <RRP_SearchTip>Show only resources whose name contains the text. Click again to close the search.</RRP_SearchTip>
-  <RRP_ModeTip>Showing the {0} list. Click to switch to the {1} list.</RRP_ModeTip>
   <RRP_Mode_Grouped>grouped</RRP_Mode_Grouped>
   <RRP_Mode_Simple>simple</RRP_Mode_Simple>
   <RRP_Mode_Categorized>categorized</RRP_Mode_Categorized>
@@ -118,7 +117,8 @@
   <RRP_ShowAllHidden>Show all hidden</RRP_ShowAllHidden>
   <RRP_ResetOrder>Reset the {0} order</RRP_ResetOrder>
   <RRP_OpenSettings>Settings...</RRP_OpenSettings>
-  <RRP_OpenSettingsTip>Opens Resource Readout+'s settings: the list, names, width, background opacity, counting, trends and minimum stock.</RRP_OpenSettingsTip>
+  <RRP_PanelMenu>List and settings</RRP_PanelMenu>
+  <RRP_PanelMenuTip>Switch between the grouped, simple and categorized lists, change what rows show, organize groups and open the settings.</RRP_PanelMenuTip>
   <RRP_Organize>Organize resources...</RRP_Organize>
   <RRP_NewSubgroup>New subgroup...</RRP_NewSubgroup>
   <RRP_NewSubgroupTitle>New group inside {0}</RRP_NewSubgroupTitle>
@@ -182,7 +182,7 @@
   <RRP_SectionStock>Minimum stock</RRP_SectionStock>
   <RRP_SectionReset>Reset</RRP_SectionReset>
   <RRP_Mode>List</RRP_Mode>
-  <RRP_ModeSettingTip>How the readout lists resources. The button on its title bar switches too.</RRP_ModeSettingTip>
+  <RRP_ModeSettingTip>How the readout lists resources. The cog on its title bar switches too.</RRP_ModeSettingTip>
   <RRP_ShowNames>Show names</RRP_ShowNames>
   <RRP_ShowNamesTip>Shows each resource's name beside its count. Without names the readout is narrower.</RRP_ShowNamesTip>
   <RRP_Width>Width with names</RRP_Width>
