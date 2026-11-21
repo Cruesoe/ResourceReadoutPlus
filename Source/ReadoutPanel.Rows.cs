@@ -32,9 +32,6 @@ public static partial class ReadoutPanel
         inner.xMin += row.depth * Indent;
         switch (row.kind)
         {
-            case RowKind.Header:
-                CoreWidgets.Line(new Rect(inner.x + 4f, inner.y, inner.width - 4f, inner.height), row.label, Theme.TextDim);
-                break;
             case RowKind.Group:
             case RowKind.Category:
                 DrawHeader(row, inner);
@@ -45,9 +42,14 @@ public static partial class ReadoutPanel
         }
 
         GUI.color = Color.white;
+        if (row.pinnedEnd)
+        {
+            Theme.Divider(rect.x + 4f, rect.yMax - 1f, rect.width - 8f);
+        }
+
         if (!dragging && interactive && row.tipBody != null)
         {
-            if (Settings.hoverChart && Settings.trends && row.kind != RowKind.Header)
+            if (Settings.hoverChart && Settings.trends)
             {
                 ResourceTipCard.Region(rect, row);
             }

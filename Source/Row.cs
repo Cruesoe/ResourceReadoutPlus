@@ -13,6 +13,9 @@ public sealed class Row
     public string label = "";
     public int depth;
 
+    // The last pinned row, drawn with a divider under it.
+    public bool pinnedEnd;
+
     // The thing shown (for a family, the first visible member's icon), or the category behind a category or family row.
     public ThingDef? def;
     public ThingCategoryDef? category;

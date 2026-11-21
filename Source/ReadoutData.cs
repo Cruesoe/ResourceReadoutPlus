@@ -590,7 +590,6 @@ public static partial class ReadoutData
 
         List<string> keys = new List<string>();
         int start = Rows.Count;
-        Rows.Add(new Row { kind = RowKind.Header, key = Keys.PinnedList, label = "RRP_Pinned".Translate(), list = Keys.PinnedList, opens = Keys.PinnedList });
         foreach (string key in Settings.pinned)
         {
             if (Keys.ThingOf(key) is ThingDef thing && Counts.ContainsKey(thing))
@@ -598,7 +597,7 @@ public static partial class ReadoutData
                 keys.Add(key);
                 if (!filtering || Settings.pinnedIgnoreFilter || Matches(thing))
                 {
-                    AddThing(map, thing, 1, Keys.PinnedList, key, draggable: true);
+                    AddThing(map, thing, 0, Keys.PinnedList, key, draggable: true);
                 }
             }
             else if (key.StartsWith(Keys.Family) && Keys.CategoryOf(key) is ThingCategoryDef family)
@@ -624,9 +623,9 @@ public static partial class ReadoutData
         }
 
         ListUnits[Keys.PinnedList] = keys;
-        if (Rows.Count == start + 1)
+        if (Rows.Count > start)
         {
-            Rows.RemoveAt(start);
+            Rows[Rows.Count - 1].pinnedEnd = true;
         }
     }
 
@@ -639,7 +638,7 @@ public static partial class ReadoutData
             kind = RowKind.Family,
             key = unit.key,
             label = family.LabelCap,
-            depth = 1,
+            depth = 0,
             def = FirstVisible(unit) ?? unit.members[0],
             category = family,
             members = unit.members,
@@ -660,7 +659,7 @@ public static partial class ReadoutData
             {
                 if (Visible(member, CountOf(member)))
                 {
-                    AddThing(map, member, 2, Keys.PinnedList, unit.key, draggable: false);
+                    AddThing(map, member, 1, Keys.PinnedList, unit.key, draggable: false);
                 }
             }
         }

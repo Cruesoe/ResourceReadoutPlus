@@ -173,7 +173,7 @@ public static partial class ReadoutPanel
             targetList = below?.list ?? dragged.list;
             after = null;
         }
-        else if (above.opens != null && (above.open || above.kind == RowKind.Header))
+        else if (above.opens != null && above.open)
         {
             targetList = above.opens;
             after = null;
@@ -210,7 +210,7 @@ public static partial class ReadoutPanel
         Row? above = slot > 0 ? rows[slot - 1] : null;
         string? parent;
         string? after;
-        if (above == null || above.kind == RowKind.Header || above.list == Keys.PinnedList)
+        if (above == null || above.list == Keys.PinnedList)
         {
             parent = null;
             after = null;

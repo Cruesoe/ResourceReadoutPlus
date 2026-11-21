@@ -4,7 +4,6 @@
   <RRP_SettingsCategory>Resource Readout+</RRP_SettingsCategory>
   <RRP_Title>Resources</RRP_Title>
   <RRP_Empty>Nothing stored yet.</RRP_Empty>
-  <RRP_Pinned>Pinned</RRP_Pinned>
   <RRP_SearchHint>Search resources</RRP_SearchHint>
   <RRP_SearchTip>Show only resources whose name contains the text. Click again to close the search.</RRP_SearchTip>
   <RRP_Mode_Grouped>grouped</RRP_Mode_Grouped>

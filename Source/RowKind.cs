@@ -6,5 +6,4 @@ public enum RowKind
     Family,
     Group,
     Category,
-    Header,
 }
