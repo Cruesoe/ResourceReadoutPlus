@@ -13,6 +13,9 @@ public sealed class Row
     public string label = "";
     public int depth;
 
+    // The last pinned row, drawn with a divider under it.
+    public bool pinnedEnd;
+
     // The thing shown (for a family, the first visible member's icon), or the category behind a category or family row.
     public ThingDef? def;
     public ThingCategoryDef? category;
@@ -24,11 +27,27 @@ public sealed class Row
     public float countWidth = -1f;
     public int minimum = -1;
     public bool low;
+    public bool near;
 
     // Change over the trend window: sign drawn as an arrow, amount for the tooltip.
     public int trend;
     public int change;
     public bool hasChange;
+
+    // Ticks until it runs out at the current rate (-1 when not falling), and its short form when drawn in the row.
+    public int ticksLeft = -1;
+    public string? runOutText;
+    public float runOutWidth = -1f;
+
+    // A thing's new or back-in-stock mark; for headers and families, whether anything inside has one.
+    public int mark;
+    public bool marked;
+
+    // The things a group's or category's hover chart adds up.
+    public List<ThingDef>? chartDefs;
+
+    // Tooltip text, built the first time the row is hovered.
+    public string? tipText;
 
     public bool expandable;
     public bool open;

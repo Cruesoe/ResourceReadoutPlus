@@ -43,7 +43,14 @@ public class ResourceTrends : TrendBook
     // Change from the sample at the start of the window to now; false without enough history.
     public bool Change(Map map, ThingDef def, int current, int window, out int change)
     {
+        return Change(map, def, current, window, out change, out _);
+    }
+
+    // As above, with the ticks between the sample compared against and now.
+    public bool Change(Map map, ThingDef def, int current, int window, out int change, out int elapsed)
+    {
         change = 0;
+        elapsed = 0;
         TrendSeries? series = SeriesFor(map, def);
         if (series == null || series.Count == 0)
         {
@@ -62,11 +69,13 @@ public class ResourceTrends : TrendBook
             if (series.ticks[i] >= start)
             {
                 change = current - series.values[i];
+                elapsed = ticks - series.ticks[i];
                 return true;
             }
         }
 
         change = current - series.Last;
+        elapsed = ticks - series.LastTick;
         return true;
     }
 

@@ -4,30 +4,34 @@ No more columns of unlabeled icons: resources are sorted into groups you recogni
 
 [h2]Features[/h2]
 [list]
-[*][b]Groups:[/b] Materials, food, meals, medicine, drugs, textiles, manufactured goods and items, each with its total. Click a group to fold it. Rename them, drag them into a new order, or make groups of your own.
-[*][b]Look-alikes combined:[/b] Leathers, wools and stone blocks show as one row with the total, which opens to show each kind. Combine any other category from the right-click menu.
-[*][b]Three lists:[/b] Grouped, simple or the base game's category tree, switched from the button on the panel's title bar. Every list gets names, tooltips and the features below.
+[*][b]Groups:[/b] Essentials, food (meat and fish, vegetables, animal products, animal feed), meals, medicine, drugs (social, hard, medical, serums and catalysts), textiles, materials, manufactured goods, ammo (mortar shells and any mod ammo), items and waste, each with its total. Click a group to fold it.
+[*][b]Your own groups:[/b] Make groups and subgroups, rename any group, and drag groups into a new order or inside one another.
+[*][b]Organizer:[/b] A window listing every group and resource. Drag resources into order, hide or show them one by one, search every resource and move it to any group, and bring back anything hidden by mistake.
+[*][b]Look-alikes combined:[/b] Leathers, wools, stone blocks, fish and eggs show as one row with the total, which opens to show each kind. Combine any other category from the right-click menu.
+[*][b]Three lists:[/b] Grouped, simple or the base game's category tree, switched from the cog on the panel's title bar. Every list gets names, tooltips and the features below.
 [*][b]Names:[/b] Each row can show the item's name beside its count, with an adjustable panel width.
 [*][b]Tooltips:[/b] Hover a row for its description, how many are in storage and lying elsewhere on the map, their value and how the count has changed.
 [*][b]Jump to it:[/b] Click a row to jump to where it's stored; click again for the next stack.
 [*][b]Drag and drop:[/b] Drag rows to reorder them, into another group or category, or onto the pinned section.
 [*][b]Pinned rows:[/b] Keep the resources you watch most at the top.
-[*][b]Minimum stock:[/b] Set a minimum on any row, group or category. Below it the row turns red, and an optional alert lists everything running low.
+[*][b]Minimum stock:[/b] Off until you want it: set a minimum on any row, group or category. Below it the row turns red, and an optional alert lists everything running low.
 [*][b]Trends:[/b] Small arrows show what went up or down over the last day (the period is adjustable). Counts are recorded hourly and saved with your game, and each resource's history opens from its menu.
+[*][b]Charts and run-out estimates:[/b] Hover a row for a small chart of its count over the last few days; groups chart their totals. Falling resources say roughly when they'll run out, in the tooltip or beside the count.
+[*][b]Filter:[/b] Show only what's trending, falling, low (or close to its minimum) or new, from the funnel on the title bar or a hotkey you set. Groups open to show what matches, and pinned rows can stay on show.
+[*][b]Sort by change:[/b] Put the resources that moved most at the top of each group.
+[*][b]New resources:[/b] Resources stored for the first time get a mark, and so can ones back in stock after running out. Marks clear themselves after a day (adjustable) or when you click the row.
 [*][b]Count all on the map:[/b] Count everything lying on the map rather than just what's in storage, for a row, category or group, optionally including what colonists carry.
 [*][b]Hide and search:[/b] Hide rows you don't care about, show zero counts, and filter the list with the search box.
+[*][b]Settings cog and opacity:[/b] A cog on the panel switches the list, changes what rows show and opens the settings, where a slider sets how solid the background is.
 [*][b]Fold away:[/b] Fold the whole panel to a slim strip when you want the map clear.
-[*][b]Colors:[/b] The low stock, rising and falling colors can be changed in UI Rethemed - Core's theme settings.
+[*][b]Colors:[/b] The low stock, rising, falling and new colors can be changed in UI Rethemed - Core's theme settings.
 [/list]
-
-[h2]Vanilla UI+ players[/h2]
-Your resource order, moves between categories, hidden rows and count-all choices are brought over the first time this mod starts, and Vanilla UI+ leaves the resource list to this mod.
 
 [h2]Requirements[/h2]
 [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3832843406]UI Rethemed - Core[/url] and Harmony.
 
 [h2]Compatibility[/h2]
-Safe to add to an existing save. Removing it leaves a harmless one-time error about its saved trend history when the save next loads. Other mods that change the resource list, such as Dubs Mint Menus' pinned resources, are replaced by this mod's own panel.
+Safe to add to an existing save. Removing it leaves harmless one-time errors about its saved trend history and new-resource records when the save next loads. Other mods that change the resource list, such as Dubs Mint Menus' pinned resources, are replaced by this mod's own panel.
 
 [h2]Credits[/h2]
 Thanks to [b]Lazy Friday Studio[/b] for UI Rethemed and permission to build on it.

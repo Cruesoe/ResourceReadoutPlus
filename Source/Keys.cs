@@ -10,13 +10,17 @@ public static class Keys
     public const string Group = "G:";
     public const string Family = "F:";
 
-    // Parent key for the categorized top level, as Vanilla UI+ saved it.
+    // Parent key for the categorized top level.
     public const string Top = "TOP";
 
     // Drag lists that aren't a group or category.
     public const string PinnedList = "PIN";
     public const string SimpleList = "SIMPLE";
-    public const string GroupsList = "GROUPS";
+
+    // Child groups of a group (or the top level, with nothing after the colon).
+    public const string GroupsList = "GROUPS:";
+
+    public static string GroupsOf(string? groupKey) => GroupsList + (groupKey ?? "");
 
     // Session lifetime: defs never change while the game runs.
     private static readonly System.Collections.Generic.Dictionary<Def, string> Cached = new System.Collections.Generic.Dictionary<Def, string>();

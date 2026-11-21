@@ -31,7 +31,12 @@ public static class ReadoutTips
 
         if (row.minimum >= 0)
         {
-            Line((row.low ? "RRP_TipBelowMinimum" : "RRP_TipMinimum").Translate(row.minimum.ToStringCached()));
+            Line((row.low ? "RRP_TipBelowMinimum" : row.near ? "RRP_TipNearMinimum" : "RRP_TipMinimum").Translate(row.minimum.ToStringCached()));
+        }
+
+        if (row.marked && row.kind != RowKind.Item)
+        {
+            Line("RRP_TipNewInside".Translate());
         }
 
         Text.AppendLine();
@@ -67,6 +72,16 @@ public static class ReadoutTips
         if (row.hasChange)
         {
             Line("RRP_TipChange".Translate(row.change.ToStringWithSign(), ReadoutMod.Settings.trendHours.ToStringCached()));
+        }
+
+        if (ReadoutMod.Settings.runOutTip && row.ticksLeft >= 0)
+        {
+            Line("RRP_TipRunOut".Translate(ReadoutData.RunOutShort(row.ticksLeft)));
+        }
+
+        if (row.mark != ResourceDiscoveries.None)
+        {
+            Line((row.mark == ResourceDiscoveries.New ? "RRP_TipNew" : "RRP_TipBack").Translate());
         }
     }
 

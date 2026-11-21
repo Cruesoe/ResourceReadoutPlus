@@ -30,6 +30,13 @@
         <group>Readout</group>
         <color>Yellow</color>
       </li>
+      <li>
+        <key>New</key>
+        <label>new</label>
+        <description>The mark on resources that are new or back in stock, and the dot on groups holding them.</description>
+        <group>Readout</group>
+        <color>Blue</color>
+      </li>
     </colors>
   </UIRethemed.Core.ModThemeDef>
 </Defs>

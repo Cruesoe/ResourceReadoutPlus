@@ -14,12 +14,16 @@ public static class SettingsPage
     private static readonly Texture2D CountingTex = CoreWidgets.Icon("hash");
     private static readonly Texture2D TrendsTex = CoreWidgets.Icon("chart-line-up");
     private static readonly Texture2D StockTex = CoreWidgets.Icon("warning");
-    private static readonly Texture2D ImportTex = CoreWidgets.Icon("arrow-line-down");
     private static readonly Texture2D ResetTex = CoreWidgets.Icon("arrow-clockwise");
     private static readonly Texture2D ModeTex = CoreWidgets.Icon("rows");
+    private static readonly Texture2D OrganizeTex = CoreWidgets.Icon("list-checks");
+    private static readonly Texture2D HiddenTex = CoreWidgets.Icon("eye-slash");
 
     // Session lifetime: which cards are open, starting all open.
-    private static readonly List<string> Open = new List<string> { "Display", "Counting", "Trends", "Stock", "Import", "Reset" };
+    private static readonly List<string> Open = new List<string> { "Organize", "Display", "Filter", "Counting", "Trends", "New", "Stock", "Reset" };
+    private static readonly Texture2D FilterTex = CoreWidgets.Icon("funnel");
+    private static readonly Texture2D NewTex = CoreWidgets.Icon("sparkle");
+    private static readonly ShowFilter[] FilterKinds = { ShowFilter.Trending, ShowFilter.Falling, ShowFilter.Low, ShowFilter.New };
     private static SettingsCards? cards;
     private static Vector2 leftScroll;
     private static Vector2 rightScroll;
@@ -54,7 +58,9 @@ public static class SettingsPage
 
     private static float DrawLeft(float y, float width)
     {
-        y = cards!.Card(y, width, "Display", DisplayTex, "RRP_SectionDisplay".Translate(), null, Display);
+        y = cards!.Card(y, width, "Organize", OrganizeTex, "RRP_SectionOrganize".Translate(), null, Organize);
+        y = cards.Card(y, width, "Display", DisplayTex, "RRP_SectionDisplay".Translate(), null, Display);
+        y = cards.Card(y, width, "Filter", FilterTex, "RRP_SectionFilter".Translate(), null, Filter);
         y = cards.Card(y, width, "Counting", CountingTex, "RRP_SectionCounting".Translate(), null, Counting);
         return y;
     }
@@ -62,10 +68,31 @@ public static class SettingsPage
     private static float DrawRight(float y, float width)
     {
         y = cards!.Card(y, width, "Trends", TrendsTex, "RRP_SectionTrends".Translate(), null, Trends);
+        y = cards.Card(y, width, "New", NewTex, "RRP_SectionNew".Translate(), null, NewResources);
         y = cards.Card(y, width, "Stock", StockTex, "RRP_SectionStock".Translate(), null, Stock);
-        y = cards.Card(y, width, "Import", ImportTex, "RRP_SectionImport".Translate(), null, Import);
         y = cards.Card(y, width, "Reset", ResetTex, "RRP_SectionReset".Translate(), null, Reset);
         return y;
+    }
+
+    private static void Organize(Listing_Standard listing)
+    {
+        SettingsCards.Hint(listing, "RRP_OrganizeHint".Translate());
+        if (Button(listing, "RRP_Organize".Translate(), OrganizeTex))
+        {
+            cards!.Later(() => Find.WindowStack.Add(new Window_OrganizeResources()));
+        }
+
+        listing.Gap(4f);
+        if (Button(listing, "RRP_ShowHiddenList".Translate(Settings.hidden.Count), HiddenTex))
+        {
+            cards!.Later(() => Find.WindowStack.Add(new Window_OrganizeResources(Window_OrganizeResources.ShowHidden)));
+        }
+    }
+
+    private static bool Button(Listing_Standard listing, string label, Texture icon)
+    {
+        Rect line = listing.GetRect(30f);
+        return CoreWidgets.Button(new Rect(line.x, line.y, Mathf.Min(line.width, CoreWidgets.ButtonWidth(label, true)), line.height), label, icon);
     }
 
     private static void Display(Listing_Standard listing)
@@ -78,6 +105,12 @@ public static class SettingsPage
             value => Mathf.RoundToInt(value).ToString(), ReadoutSettings.UsualWidth, value =>
             {
                 Settings.width = value;
+                Settings.Changed();
+            });
+        cards.Slider(listing, "RRP_Opacity".Translate(), "RRP_OpacityTip".Translate(), Settings.opacity, ReadoutSettings.MinOpacity, 1f, 0.05f,
+            value => Mathf.RoundToInt(value * 100f) + "%", ReadoutSettings.DefaultOpacity, value =>
+            {
+                Settings.opacity = value;
                 Settings.Changed();
             });
         Tick(listing, "RRP_ShortNumbers", ref Settings.shortNumbers);
@@ -126,6 +159,101 @@ public static class SettingsPage
                 Settings.trendHours = Mathf.RoundToInt(value);
                 Settings.Changed();
             });
+
+        bool trends = Settings.trends;
+        TickIf(listing, "RRP_HoverChart", ref Settings.hoverChart, trends, "RRP_NeedsTrends");
+        Greyed(trends && Settings.hoverChart, () => cards.Slider(listing, "RRP_ChartDays".Translate(), "RRP_ChartDaysTip".Translate(), Settings.chartDays,
+            ReadoutSettings.MinChartDays, ReadoutSettings.MaxChartDays, 1f, value => "RRP_Days".Translate(Mathf.RoundToInt(value)), ReadoutSettings.UsualChartDays, value =>
+            {
+                Settings.chartDays = Mathf.RoundToInt(value);
+                Settings.Changed();
+            }));
+        TickIf(listing, "RRP_RunOutInTooltip", ref Settings.runOutTip, trends, "RRP_NeedsTrends");
+        TickIf(listing, "RRP_RunOutRow", ref Settings.runOutRow, trends, "RRP_NeedsTrends");
+        TickIf(listing, "RRP_SortByChange", ref Settings.sortByChange, trends, "RRP_NeedsTrends");
+    }
+
+    private static void Filter(Listing_Standard listing)
+    {
+        SettingsCards.Hint(listing, "RRP_FilterHint".Translate());
+        foreach (ShowFilter kind in FilterKinds)
+        {
+            string key = "RRP_Filter_" + kind;
+            bool available = kind == ShowFilter.Low || (kind == ShowFilter.New ? Settings.newMarks : Settings.trends);
+            bool on = (Settings.filters & kind) != 0;
+            bool before = on;
+            if (available)
+            {
+                SettingsCards.Tick(listing, key.Translate(), ref on, (key + "Tip").Translate());
+            }
+            else
+            {
+                SettingsCards.Tick(listing, null, Theme.TextDim, key.Translate(), ref on, (kind == ShowFilter.New ? "RRP_NeedsNewMarks" : "RRP_NeedsTrends").Translate(), false);
+            }
+
+            if (on != before)
+            {
+                Settings.filters ^= kind;
+                Settings.filtering = Settings.filters != ShowFilter.None;
+                Settings.Changed();
+            }
+        }
+
+        Tick(listing, "RRP_Filtering", ref Settings.filtering);
+        Tick(listing, "RRP_PinnedIgnoreFilter", ref Settings.pinnedIgnoreFilter);
+        cards!.Slider(listing, "RRP_NearPercent".Translate(), "RRP_NearPercentTip".Translate(), Settings.nearPercent, 0f, ReadoutSettings.MaxNearPercent, 5f,
+            value => Mathf.RoundToInt(value) + "%", ReadoutSettings.UsualNearPercent, value =>
+            {
+                Settings.nearPercent = Mathf.RoundToInt(value);
+                Settings.Changed();
+            });
+    }
+
+    private static void NewResources(Listing_Standard listing)
+    {
+        Tick(listing, "RRP_NewMarks", ref Settings.newMarks);
+        TickIf(listing, "RRP_BackInStock", ref Settings.backInStock, Settings.newMarks, "RRP_NeedsNewMarks");
+        Greyed(Settings.newMarks, () => cards!.Slider(listing, "RRP_NewHours".Translate(), "RRP_NewHoursTip".Translate(), Settings.newHours,
+            ReadoutSettings.MinNewHours, ReadoutSettings.MaxNewHours, 1f, value => "RRP_Hours".Translate(Mathf.RoundToInt(value)), ReadoutSettings.UsualNewHours, value =>
+            {
+                Settings.newHours = Mathf.RoundToInt(value);
+                Settings.Changed();
+            }));
+    }
+
+    // A tick that needs another setting: greyed out and inert with a tooltip naming it when that is off.
+    private static void TickIf(Listing_Standard listing, string key, ref bool value, bool enabled, string needs)
+    {
+        if (enabled)
+        {
+            Tick(listing, key, ref value);
+            return;
+        }
+
+        bool shown = value;
+        SettingsCards.Tick(listing, null, Theme.TextDim, key.Translate(), ref shown, needs.Translate(), false);
+    }
+
+    // Draws a control greyed out and inert unless enabled.
+    private static void Greyed(bool enabled, Action draw)
+    {
+        bool wasEnabled = GUI.enabled;
+        Color wasColor = GUI.color;
+        if (!enabled)
+        {
+            GUI.enabled = false;
+            GUI.color = new Color(1f, 1f, 1f, 0.4f);
+        }
+
+        try
+        {
+            draw();
+        }
+        finally
+        {
+            GUI.enabled = wasEnabled;
+            GUI.color = wasColor;
+        }
     }
 
     private static void Stock(Listing_Standard listing)
@@ -138,17 +266,6 @@ public static class SettingsPage
                 Settings.minimums.Clear();
                 Settings.Changed();
             });
-        }
-    }
-
-    private static void Import(Listing_Standard listing)
-    {
-        bool found = UiPlusImport.SettingsFile() != null;
-        SettingsCards.Hint(listing, "RRP_ImportHint".Translate());
-        if (SettingsCards.ResetButton(listing, "RRP_ImportNow".Translate(), found, "RRP_ImportNowTip".Translate(), "RRP_ImportNotFound".Translate()))
-        {
-            bool any = UiPlusImport.Run();
-            Messages.Message((any ? "RRP_Imported" : "RRP_ImportedNothing").Translate(), RimWorld.MessageTypeDefOf.NeutralEvent, historical: false);
         }
     }
 
