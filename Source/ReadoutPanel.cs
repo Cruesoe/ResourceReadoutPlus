@@ -186,9 +186,9 @@ public static partial class ReadoutPanel
         CoreWidgets.SurfaceAlpha = Opacity;
         try
         {
-            // The title icon only when the tools leave room for it; the folded strip always has it.
+            // The title icon only when the tools leave room for it; the folded strip always has it. The open panel has no title text, only the folded strip's tooltip names it.
             Texture2D? icon = folded || width - FoldRoom - ToolsWidth >= IconRoom ? TitleTex : null;
-            bool open = SidePanel.Begin(panelRect, title, icon, ref folded, SidePanel.Side.Left, out Rect inner, out Rect titleBar, out float right, tools: ToolsWidth);
+            bool open = SidePanel.Begin(panelRect, folded ? title : null, icon, ref folded, SidePanel.Side.Left, out Rect inner, out Rect titleBar, out float right, tools: ToolsWidth);
             if (folded != Settings.folded)
             {
                 Settings.folded = folded;
