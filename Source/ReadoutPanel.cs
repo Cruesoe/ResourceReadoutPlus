@@ -19,6 +19,11 @@ public static partial class ReadoutPanel
     private const float Top = 7f;
     private const float BottomRoom = 200f;
     private const float NarrowWidth = 150f;
+
+    // Title bar room: three 32 px tools, the fold button and the title icon with its margin.
+    private const float ToolsWidth = 96f;
+    private const float FoldRoom = 32f;
+    private const float IconRoom = 32f;
     private const float FoldedHeight = 70f;
     private const float TitleHeight = 30f;
     private const float SearchHeight = 28f;
@@ -27,6 +32,8 @@ public static partial class ReadoutPanel
 
     private static readonly Texture2D TitleTex = CoreWidgets.Icon("stack");
     private static readonly Texture2D SearchTex = CoreWidgets.Icon("magnifying-glass");
+    private static readonly Texture2D FilterTex = CoreWidgets.Icon("funnel");
+    private static readonly Texture2D SettingsTex = CoreWidgets.Icon("gear-six");
     private static readonly Texture2D GroupedTex = CoreWidgets.Icon("squares-four");
     private static readonly Texture2D SimpleTex = CoreWidgets.Icon("list");
     private static readonly Texture2D CategorizedTex = CoreWidgets.Icon("tree-structure");
@@ -37,6 +44,11 @@ public static partial class ReadoutPanel
     private static Rect outRect;
     private static float contentHeight;
     private static bool interactive;
+
+    // Where the panel ended on the last frame it was drawn, for placing the top-left messages beside it.
+    private const float MessageGap = 8f;
+    private static float drawnRight;
+    private static int drawnFrame = -10;
     private static readonly Action Draw = DrawPanel;
 
     // Translated once per language.
@@ -44,7 +56,12 @@ public static partial class ReadoutPanel
     private static string? searchHint;
     private static string? searchTip;
     private static string? empty;
-    private static readonly Dictionary<ReadoutMode, string> ModeTips = new Dictionary<ReadoutMode, string>();
+    private static string? settingsTitle;
+    private static string? settingsTip;
+    private static string? filterTitle;
+    private static string? filterEmpty;
+    private static string? filterTip;
+    private static KeyCode filterTipFor;
     private static LoadedLanguage? textLanguage;
 
     private static ReadoutSettings Settings => ReadoutMod.Settings;
@@ -105,29 +122,39 @@ public static partial class ReadoutPanel
         searchHint = "RRP_SearchHint".Translate();
         searchTip = "RRP_SearchTip".Translate();
         empty = "RRP_Empty".Translate();
-        ModeTips.Clear();
-        foreach (ReadoutMode mode in Enum.GetValues(typeof(ReadoutMode)))
-        {
-            ModeTips[mode] = "RRP_ModeTip".Translate(ModeLabel(mode), ModeLabel(NextMode(mode)));
-        }
+        settingsTitle = "RRP_PanelMenu".Translate();
+        settingsTip = "RRP_PanelMenuTip".Translate();
+        filterTitle = "RRP_FilterTitle".Translate();
+        filterEmpty = "RRP_FilterEmpty".Translate();
+        filterTip = null;
     }
 
+    private static readonly string[] ModeKeys = { "RRP_Mode_Grouped", "RRP_Mode_Simple", "RRP_Mode_Categorized" };
+
+    // A list's name in lower case, for use inside sentences.
     public static string ModeLabel(ReadoutMode mode)
     {
-        return ("RRP_Mode_" + mode).Translate();
+        return Translations.Of(ModeKeys[(int)mode]);
     }
 
-    private static ReadoutMode NextMode(ReadoutMode mode)
+    public static string ModeTitle(ReadoutMode mode)
     {
-        return mode switch
-        {
-            ReadoutMode.Grouped => ReadoutMode.Simple,
-            ReadoutMode.Simple => ReadoutMode.Categorized,
-            _ => ReadoutMode.Grouped,
-        };
+        return Translations.Capital(ModeKeys[(int)mode]);
     }
 
-    private static Texture2D ModeIcon(ReadoutMode mode)
+    public static string ModeTip(ReadoutMode mode)
+    {
+        return Translations.Tip(ModeKeys[(int)mode]);
+    }
+
+    public static void SetMode(ReadoutMode mode)
+    {
+        Settings.mode = mode;
+        scroll = Vector2.zero;
+        Settings.Changed();
+    }
+
+    public static Texture2D ModeIcon(ReadoutMode mode)
     {
         return mode switch
         {
@@ -140,6 +167,7 @@ public static partial class ReadoutPanel
     private static void DrawPanel()
     {
         Translate();
+        FilterKey();
         Map map = Find.CurrentMap;
         ReadoutData.Ensure(map);
         interactive = !Find.WindowStack.MouseObscuredNow;
@@ -150,19 +178,32 @@ public static partial class ReadoutPanel
         float most = UI.screenHeight - Top - BottomRoom;
         float wanted = Settings.folded ? FoldedHeight : TitleHeight + Gap * 2f + (searching ? SearchHeight + Gap : 0f) + contentHeight;
         panelRect = new Rect(Left, Top, width, Mathf.Min(wanted, most));
+        drawnRight = panelRect.xMax;
+        drawnFrame = Time.frameCount;
 
         bool folded = Settings.folded;
-        bool open = SidePanel.Begin(panelRect, title, TitleTex, ref folded, SidePanel.Side.Left, out Rect inner, out Rect titleBar, out float right, tools: 64f);
-        if (folded != Settings.folded)
+        float surface = CoreWidgets.SurfaceAlpha;
+        CoreWidgets.SurfaceAlpha = Opacity;
+        try
         {
-            Settings.folded = folded;
-            Settings.Changed();
-        }
+            // The title icon only when the tools leave room for it; the folded strip always has it. The open panel has no title text, only the folded strip's tooltip names it.
+            Texture2D? icon = folded || width - FoldRoom - ToolsWidth >= IconRoom ? TitleTex : null;
+            bool open = SidePanel.Begin(panelRect, folded ? title : null, icon, ref folded, SidePanel.Side.Left, out Rect inner, out Rect titleBar, out float right, tools: ToolsWidth);
+            if (folded != Settings.folded)
+            {
+                Settings.folded = folded;
+                Settings.Changed();
+            }
 
-        if (open)
+            if (open)
+            {
+                TitleTools(titleBar, right);
+                DrawBody(inner, rows);
+            }
+        }
+        finally
         {
-            TitleTools(titleBar, right);
-            DrawBody(inner, rows);
+            CoreWidgets.SurfaceAlpha = surface;
         }
 
         if (interactive)
@@ -171,13 +212,25 @@ public static partial class ReadoutPanel
         }
     }
 
+    // The messages' left edge: right of the panel when it was drawn this frame or the last, else the base game's.
+    public static float MessagesX(float usual)
+    {
+        return Time.frameCount - drawnFrame <= 1 ? Mathf.Max(usual, drawnRight + MessageGap) : usual;
+    }
+
+    // The panel's background opacity, from the settings slider.
+    public static float Opacity => Mathf.Clamp(Settings.opacity, ReadoutSettings.MinOpacity, 1f);
+
     private static void TitleTools(Rect titleBar, float right)
     {
-        if (CoreWidgets.TitleTool(titleBar, ref right, ModeIcon(Settings.mode), ModeLabel(Settings.mode), ModeTips[Settings.mode]))
+        if (CoreWidgets.TitleTool(titleBar, ref right, SettingsTex, settingsTitle, settingsTip))
         {
-            Settings.mode = NextMode(Settings.mode);
-            scroll = Vector2.zero;
-            Settings.Changed();
+            ReadoutMenu.OpenPanel();
+        }
+
+        if (CoreWidgets.TitleTool(titleBar, ref right, FilterTex, filterTitle, FilterTip(), on: Settings.Filtering))
+        {
+            ReadoutMenu.OpenFilter();
         }
 
         if (CoreWidgets.TitleTool(titleBar, ref right, SearchTex, searchHint, searchTip, on: searching))
@@ -194,6 +247,39 @@ public static partial class ReadoutPanel
         }
     }
 
+    // The filter button's tooltip, naming the hotkey; rebuilt when the binding changes.
+    private static string FilterTip()
+    {
+        KeyCode key = ReadoutDefOf.RRP_ToggleFilter.MainKey;
+        if (filterTip == null || filterTipFor != key)
+        {
+            filterTipFor = key;
+            filterTip = key == KeyCode.None ? "RRP_FilterTip".Translate() : "RRP_FilterTipKey".Translate(ReadoutDefOf.RRP_ToggleFilter.MainKeyLabel);
+        }
+
+        return filterTip;
+    }
+
+    // The hotkey switches between the full list and the chosen filter; with no filter chosen it opens the filter menu.
+    private static void FilterKey()
+    {
+        if (Event.current.type != EventType.KeyDown || GUIUtility.keyboardControl != 0 || !ReadoutDefOf.RRP_ToggleFilter.KeyDownEvent)
+        {
+            return;
+        }
+
+        Event.current.Use();
+        if (Settings.filters == ShowFilter.None)
+        {
+            ReadoutMenu.OpenFilter();
+            return;
+        }
+
+        Settings.filtering = !Settings.filtering;
+        scroll = Vector2.zero;
+        Settings.Changed();
+    }
+
     private static void DrawBody(Rect inner, List<Row> rows)
     {
         Rect body = inner;
@@ -207,7 +293,7 @@ public static partial class ReadoutPanel
         outRect = body;
         if (rows.Count == 0)
         {
-            CoreWidgets.Empty(body, empty);
+            CoreWidgets.Empty(body, Settings.Filtering ? filterEmpty : empty);
             return;
         }
 

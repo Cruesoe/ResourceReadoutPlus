@@ -1,5 +1,6 @@
 using System;
 using HarmonyLib;
+using UIRethemed.Core;
 using UnityEngine;
 using Verse;
 
@@ -11,13 +12,14 @@ public class ReadoutMod : Mod
     public static ReadoutMod? Instance;
 
     // Categories combined into one row until the player changes them.
-    public static readonly string[] UsualFamilies = { "Leathers", "Wools", "StoneBlocks" };
+    public static readonly string[] UsualFamilies = { "Leathers", "Wools", "StoneBlocks", "Fish", "EggsFertilized", "EggsUnfertilized" };
 
     public ReadoutMod(ModContentPack content)
         : base(content)
     {
         Instance = this;
         Settings = GetSettings<ReadoutSettings>();
+        WindowHooks.BeforeWindows(() => Settings.FlushIfDue());
         Patch();
         LongEventHandler.ExecuteWhenFinished(Startup);
     }
@@ -57,17 +59,22 @@ public class ReadoutMod : Mod
     private static void Startup()
     {
         bool changed = false;
-        if (!Settings.familiesSet)
+        // New usual families are added once, keeping any the player separated before.
+        if (!Settings.familiesSet || Settings.familiesVersion < ReadoutSettings.CurrentFamilies)
         {
-            Settings.familiesSet = true;
-            Settings.families.AddRange(UsualFamilies);
-            changed = true;
-        }
+            foreach (string family in UsualFamilies)
+            {
+                if (!Settings.familiesSet || (Settings.familiesVersion < 2 && (family == "Fish" || family.StartsWith("Eggs"))))
+                {
+                    if (!Settings.families.Contains(family))
+                    {
+                        Settings.families.Add(family);
+                    }
+                }
+            }
 
-        if (!Settings.importedUiPlus)
-        {
-            Settings.importedUiPlus = true;
-            UiPlusImport.Run();
+            Settings.familiesSet = true;
+            Settings.familiesVersion = ReadoutSettings.CurrentFamilies;
             changed = true;
         }
 

@@ -5,60 +5,68 @@ using Verse;
 namespace ResourceReadoutPlus;
 
 /// <summary>Sets or clears the minimum stock for a row; below it the row turns red and the low-stock alert lists it.</summary>
-public class Dialog_MinimumStock : Window
+[StaticConstructorOnStartup]
+public class Dialog_MinimumStock : ThemedPopup
 {
     private const float ButtonHeight = 32f;
-    private const int Most = 9999999;
+    private const float FieldHeight = 30f;
+    private const float HintHeight = 44f;
+    private const int MostDigits = 7;
+    private const string Field = "RRP_Minimum";
+
+    private static readonly Texture2D MinimumTex = CoreWidgets.Icon("warning");
+    private static readonly Texture2D SetTex = CoreWidgets.Icon("check");
+    private static readonly Texture2D ClearTex = CoreWidgets.Icon("x");
 
     private readonly string key;
-    private readonly string label;
-    private int value;
+    private readonly string title;
     private string buffer;
 
     public Dialog_MinimumStock(string key, string label)
     {
         this.key = key;
-        this.label = label;
-        value = ReadoutMod.Settings.minimums.TryGetValue(key, out int current) ? current : 0;
-        buffer = value > 0 ? value.ToString() : "";
+        title = "RRP_MinimumTitle".Translate(label);
+        int current = ReadoutMod.Settings.minimums.TryGetValue(key, out int saved) ? saved : 0;
+        buffer = current > 0 ? current.ToString() : "";
+        AsDialog();
         forcePause = false;
-        doCloseX = true;
-        closeOnClickedOutside = true;
-        absorbInputAroundWindow = true;
     }
 
-    public override Vector2 InitialSize => new Vector2(380f, 190f);
+    public override Vector2 InitialSize => new Vector2(380f, 220f);
 
-    public override void DoWindowContents(Rect inRect)
+    protected override string Part => "Resource Readout+ minimum stock";
+
+    protected override void Contents(Rect inRect)
     {
-        Text.Font = GameFont.Medium;
-        Widgets.Label(new Rect(inRect.x, inRect.y, inRect.width - 30f, 34f), "RRP_MinimumTitle".Translate(label));
-        Text.Font = GameFont.Small;
+        Rect body = TitleBar(inRect, MinimumTex, title, null, null);
+        Rect hint = new Rect(body.x, body.y, body.width, HintHeight);
+        Theme.Label(hint, "RRP_MinimumHint".Translate(), TextAnchor.UpperLeft, Theme.TextDim);
 
-        Rect hint = new Rect(inRect.x, inRect.y + 38f, inRect.width, 44f);
-        Widgets.Label(hint, "RRP_MinimumHint".Translate());
-
-        Rect field = new Rect(inRect.x, hint.yMax + 4f, inRect.width, 30f);
-        GUI.SetNextControlName("RRP_Minimum");
-        Widgets.TextFieldNumeric(field, ref value, ref buffer, 0, Most);
-        if (Event.current.type == EventType.Repaint && GUI.GetNameOfFocusedControl() != "RRP_Minimum")
+        Rect field = new Rect(body.x, hint.yMax + 4f, body.width, FieldHeight);
+        if (SearchField.TextBox(field, ref buffer, Field, "0", MostDigits))
         {
-            UI.FocusControl("RRP_Minimum", this);
+            buffer = Digits(buffer);
+        }
+
+        if (Event.current.type == EventType.Repaint && GUI.GetNameOfFocusedControl() != Field)
+        {
+            UI.FocusControl(Field, this);
         }
 
         bool enter = Event.current.type == EventType.KeyDown && (Event.current.keyCode == KeyCode.Return || Event.current.keyCode == KeyCode.KeypadEnter);
-        float half = (inRect.width - 10f) / 2f;
-        Rect clear = new Rect(inRect.x, inRect.yMax - ButtonHeight, half, ButtonHeight);
+        float half = (body.width - 10f) / 2f;
+        Rect clear = new Rect(body.x, body.yMax - ButtonHeight, half, ButtonHeight);
         Rect set = new Rect(clear.xMax + 10f, clear.y, half, ButtonHeight);
-        if (Widgets.ButtonText(clear, "RRP_MinimumClear".Translate(), active: ReadoutMod.Settings.minimums.ContainsKey(key)))
+        if (CoreWidgets.Button(clear, "RRP_MinimumClear".Translate(), ClearTex, enabled: ReadoutMod.Settings.minimums.ContainsKey(key), tip: "RRP_MinimumClearTip".Translate()))
         {
             ReadoutMod.Settings.minimums.Remove(key);
             ReadoutMod.Settings.Changed();
             Close();
         }
 
-        if (Widgets.ButtonText(set, "RRP_MinimumSet".Translate()) || enter)
+        if (CoreWidgets.Button(set, "RRP_MinimumSet".Translate(), SetTex) || enter)
         {
+            int value = int.TryParse(buffer, out int typed) ? typed : 0;
             if (value > 0)
             {
                 ReadoutMod.Settings.minimums[key] = value;
@@ -76,7 +84,20 @@ public class Dialog_MinimumStock : Window
 
             Close();
         }
+    }
 
-        CoreWidgets.Tip(clear, "RRP_MinimumClear".Translate(), "RRP_MinimumClearTip".Translate());
+    // Only the digits of what was typed.
+    private static string Digits(string text)
+    {
+        System.Text.StringBuilder digits = new System.Text.StringBuilder(text.Length);
+        foreach (char c in text)
+        {
+            if (c >= '0' && c <= '9')
+            {
+                digits.Append(c);
+            }
+        }
+
+        return digits.ToString();
     }
 }

@@ -33,6 +33,7 @@ public static partial class ReadoutData
         EnsureTree();
         List<Def> top = Sorted(TopLevelCache);
         ListUnits[Keys.Top] = KeysOf(top);
+        SortLevel(top);
         AddLevel(map, top, 0, Keys.Top);
     }
 
@@ -44,7 +45,8 @@ public static partial class ReadoutData
             {
                 string key = Keys.Of(category);
                 int total = CategoryTotal(map, category);
-                if (Hidden.Contains(key) || (total == 0 && !(Settings.showZero && HasResources(category))))
+                bool shown = filtering ? CategoryMatches(category, 0) : total > 0 || (Settings.showZero && HasResources(category)) || LowKeys.Contains(key) || AnyLowInside(category, 0);
+                if (Hidden.Contains(key) || !shown)
                 {
                     continue;
                 }
@@ -59,8 +61,10 @@ public static partial class ReadoutData
                     icon = category.icon,
                     count = total,
                     expandable = true,
-                    open = OpenCategories.Contains(key),
+                    open = filtering || OpenCategories.Contains(key),
                     low = LowKeys.Contains(key) || AnyLowInside(category, 0),
+                    marked = CategoryMarked(category, 0),
+                    chartDefs = ChartDefsOf(category),
                     draggable = true,
                     list = list,
                     unit = key,
@@ -73,6 +77,7 @@ public static partial class ReadoutData
                 {
                     List<Def> children = Sorted(Children(category));
                     ListUnits[key] = KeysOf(children);
+                    SortLevel(children);
                     AddLevel(map, children, depth + 1, key);
                 }
             }

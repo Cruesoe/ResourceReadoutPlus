@@ -8,9 +8,11 @@ public static class Patch_MemoryUtility_ClearAllMapsAndWorld
 {
     public static void Postfix()
     {
+        ReadoutMod.Settings.Flush();
         ReadoutData.Forget();
         ReadoutCounts.Forget();
         ReadoutJump.Forget();
         ReadoutPanel.Forget();
+        ResourceTipCard.Forget();
     }
 }
