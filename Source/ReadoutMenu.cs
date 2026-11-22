@@ -207,10 +207,7 @@ public static class ReadoutMenu
             section.items.Add(unhide);
         }
 
-        List<string> order = Settings.OrderFor(Settings.mode);
-        bool hasOrder = order.Count > 0 || (Settings.mode == ReadoutMode.Categorized && Settings.parentOf.Count > 0)
-            || (Settings.mode == ReadoutMode.Grouped && (Settings.groupOrder.Count > 0 || Settings.groupOf.Count > 0));
-        if (hasOrder)
+        if (HasOrder(Settings.mode))
         {
             ChoiceItem reset = Item("RRP_ResetOrder", ResetTex, () => ResetOrder(Settings.mode));
             reset.label = "RRP_ResetOrder".Translate(ReadoutPanel.ModeLabel(Settings.mode));
@@ -220,6 +217,13 @@ public static class ReadoutMenu
         section.items.Add(Item("RRP_Organize", OrganizeTex, () => Find.WindowStack.Add(new Window_OrganizeResources())));
         section.items.Add(Item("RRP_OpenSettings", SettingsTex, () => Find.WindowStack.Add(new Dialog_ModSettings(ReadoutMod.Instance))));
         return section;
+    }
+
+    // Whether a list has anything for its reset to undo: a saved order, moved rows or moved groups.
+    public static bool HasOrder(ReadoutMode mode)
+    {
+        return Settings.OrderFor(mode).Count > 0 || (mode == ReadoutMode.Categorized && Settings.parentOf.Count > 0)
+            || (mode == ReadoutMode.Grouped && (Settings.groupOrder.Count > 0 || Settings.groupOf.Count > 0 || Settings.groupParents.Count > 0));
     }
 
     public static void ResetOrder(ReadoutMode mode)
@@ -233,6 +237,7 @@ public static class ReadoutMenu
         {
             Settings.groupOrder.Clear();
             Settings.groupOf.Clear();
+            Settings.groupParents.Clear();
         }
 
         Settings.Changed();
@@ -422,9 +427,9 @@ public static class ReadoutMenu
             ReadoutMode captured = mode;
             section.items.Add(new ChoiceItem
             {
-                label = ReadoutPanel.ModeLabel(mode).CapitalizeFirst(),
+                label = ReadoutPanel.ModeTitle(mode),
                 icon = ReadoutPanel.ModeIcon(mode),
-                tip = ("RRP_Mode_" + mode + "Tip").Translate(),
+                tip = ReadoutPanel.ModeTip(mode),
                 on = Settings.mode == mode,
                 action = () => ReadoutPanel.SetMode(captured),
             });

@@ -54,6 +54,7 @@ public class Window_OrganizeResources : Window
     private readonly List<ReadoutUnit> units = new List<ReadoutUnit>();
     private readonly List<string> hiddenKeys = new List<string>();
     private int builtFor = -1;
+    private int notesFor = -1;
     private string builtView = "";
     private string builtSearch = "";
 
@@ -144,7 +145,7 @@ public class Window_OrganizeResources : Window
             float y = 0f;
             TreeRow(new Rect(0f, y, view.width, RowHeight), AllView, "RRP_OrganizeAll".Translate(), AllTex, 0, null);
             y += RowHeight;
-            TreeRow(new Rect(0f, y, view.width, RowHeight), HiddenView, "RRP_OrganizeHidden".Translate(Settings.hidden.Count), HiddenTex, 0, null);
+            TreeRow(new Rect(0f, y, view.width, RowHeight), HiddenView, Translations.Of("RRP_OrganizeHidden", Settings.hidden.Count), HiddenTex, 0, null);
             y += RowHeight;
             foreach (GroupInfo group in groups)
             {
@@ -252,7 +253,7 @@ public class Window_OrganizeResources : Window
     {
         Rect button = new Rect(x, rect.y, ToolSize, ToolSize);
         x += ToolSize + 4f;
-        return CoreWidgets.IconButton(button, icon, key.Translate(), (key + "Tip").Translate(), enabled: enabled);
+        return CoreWidgets.IconButton(button, icon, Translations.Of(key), Translations.Tip(key), enabled: enabled);
     }
 
     // ---- The right-hand list ------------------------------------------------------------
@@ -260,7 +261,7 @@ public class Window_OrganizeResources : Window
     private void List(Rect rect)
     {
         GroupInfo? group = ReadoutGroups.Find(selected);
-        string title = selected == AllView ? "RRP_OrganizeAll".Translate() : selected == HiddenView ? "RRP_OrganizeHidden".Translate(Settings.hidden.Count) : group?.label ?? "";
+        string title = selected == AllView ? "RRP_OrganizeAll".Translate() : selected == HiddenView ? Translations.Of("RRP_OrganizeHidden", Settings.hidden.Count) : group?.label ?? "";
         Rect panel = CoreWidgets.Panel(rect, title, selected == AllView ? AllTex : selected == HiddenView ? HiddenTex : group?.icon);
         Rebuild();
 
@@ -422,6 +423,12 @@ public class Window_OrganizeResources : Window
     {
         if (builtFor == Settings.version && builtView == selected && builtSearch == search)
         {
+            // A group's counts follow the map without rebuilding the list, so a drag in progress isn't disturbed.
+            if (notesFor != ReadoutCounts.Stamp && selected != HiddenView && selected != AllView)
+            {
+                CountNotes(Find.CurrentMap);
+            }
+
             return;
         }
 
@@ -469,6 +476,17 @@ public class Window_OrganizeResources : Window
         foreach (ReadoutUnit unit in units)
         {
             unit.label = unit.def?.LabelCap ?? unit.family?.LabelCap ?? unit.key;
+        }
+
+        CountNotes(map);
+    }
+
+    // Each unit's count beside its name in a group's list.
+    private void CountNotes(Map? map)
+    {
+        notesFor = ReadoutCounts.Stamp;
+        foreach (ReadoutUnit unit in units)
+        {
             if (map != null)
             {
                 int count = 0;

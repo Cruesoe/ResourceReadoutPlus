@@ -27,9 +27,6 @@ No more columns of unlabeled icons: resources are sorted into groups you recogni
 [*][b]Colors:[/b] The low stock, rising, falling and new colors can be changed in UI Rethemed - Core's theme settings.
 [/list]
 
-[h2]Requirements[/h2]
-[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3832843406]UI Rethemed - Core[/url] and Harmony.
-
 [h2]Compatibility[/h2]
 Safe to add to an existing save. Removing it leaves harmless one-time errors about its saved trend history and new-resource records when the save next loads. Other mods that change the resource list, such as Dubs Mint Menus' pinned resources, are replaced by this mod's own panel.
 

@@ -204,6 +204,7 @@
   <RRP_TrendHoursTip>The arrows compare the count now with the count this long ago.</RRP_TrendHoursTip>
   <RRP_Hours>{0} hours</RRP_Hours>
   <RRP_Days>{0} days</RRP_Days>
+  <RRP_Percent>{0}%</RRP_Percent>
   <RRP_HoverChart>Chart in tooltips</RRP_HoverChart>
   <RRP_HoverChartTip>Hovering a row shows a small chart of its count over the last few days, from the hourly records. Groups, categories and combined look-alikes chart their totals.</RRP_HoverChartTip>
   <RRP_ChartDays>Chart length</RRP_ChartDays>
@@ -230,8 +231,8 @@
   <RRP_ClearMinimumsConfirm>Remove every minimum stock?</RRP_ClearMinimumsConfirm>
   <RRP_ResetOrderTip>Puts every row of this list back in its usual order and place.</RRP_ResetOrderTip>
   <RRP_ResetGroups>Remove your groups and names</RRP_ResetGroups>
-  <RRP_ResetGroupsTip>Deletes the groups you made and gives the built-in groups their usual names.</RRP_ResetGroupsTip>
-  <RRP_ResetGroupsConfirm>Delete every group you made and restore the usual group names?</RRP_ResetGroupsConfirm>
+  <RRP_ResetGroupsTip>Deletes the groups you made and puts the built-in groups back in their usual places, with their usual names.</RRP_ResetGroupsTip>
+  <RRP_ResetGroupsConfirm>Delete every group you made and put the built-in groups back as they were?</RRP_ResetGroupsConfirm>
   <RRP_ShowAllHiddenCount>Show all hidden ({0})</RRP_ShowAllHiddenCount>
   <RRP_ShowAllHiddenTip>Shows every row you hid.</RRP_ShowAllHiddenTip>
   <RRP_UnpinAll>Unpin all ({0})</RRP_UnpinAll>

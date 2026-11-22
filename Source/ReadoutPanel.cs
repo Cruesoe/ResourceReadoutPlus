@@ -61,7 +61,7 @@ public static partial class ReadoutPanel
     private static string? filterTitle;
     private static string? filterEmpty;
     private static string? filterTip;
-    private static string? filterTipFor;
+    private static KeyCode filterTipFor;
     private static LoadedLanguage? textLanguage;
 
     private static ReadoutSettings Settings => ReadoutMod.Settings;
@@ -126,12 +126,25 @@ public static partial class ReadoutPanel
         settingsTip = "RRP_PanelMenuTip".Translate();
         filterTitle = "RRP_FilterTitle".Translate();
         filterEmpty = "RRP_FilterEmpty".Translate();
-        filterTipFor = null;
+        filterTip = null;
     }
 
+    private static readonly string[] ModeKeys = { "RRP_Mode_Grouped", "RRP_Mode_Simple", "RRP_Mode_Categorized" };
+
+    // A list's name in lower case, for use inside sentences.
     public static string ModeLabel(ReadoutMode mode)
     {
-        return ("RRP_Mode_" + mode).Translate();
+        return Translations.Of(ModeKeys[(int)mode]);
+    }
+
+    public static string ModeTitle(ReadoutMode mode)
+    {
+        return Translations.Capital(ModeKeys[(int)mode]);
+    }
+
+    public static string ModeTip(ReadoutMode mode)
+    {
+        return Translations.Tip(ModeKeys[(int)mode]);
     }
 
     public static void SetMode(ReadoutMode mode)
@@ -237,11 +250,11 @@ public static partial class ReadoutPanel
     // The filter button's tooltip, naming the hotkey; rebuilt when the binding changes.
     private static string FilterTip()
     {
-        string key = ReadoutDefOf.RRP_ToggleFilter.MainKeyLabel;
+        KeyCode key = ReadoutDefOf.RRP_ToggleFilter.MainKey;
         if (filterTip == null || filterTipFor != key)
         {
             filterTipFor = key;
-            filterTip = ReadoutDefOf.RRP_ToggleFilter.MainKey == KeyCode.None ? "RRP_FilterTip".Translate() : "RRP_FilterTipKey".Translate(key);
+            filterTip = key == KeyCode.None ? "RRP_FilterTip".Translate() : "RRP_FilterTipKey".Translate(ReadoutDefOf.RRP_ToggleFilter.MainKeyLabel);
         }
 
         return filterTip;

@@ -24,6 +24,7 @@ public static class SettingsPage
     private static readonly Texture2D FilterTex = CoreWidgets.Icon("funnel");
     private static readonly Texture2D NewTex = CoreWidgets.Icon("sparkle");
     private static readonly ShowFilter[] FilterKinds = { ShowFilter.Trending, ShowFilter.Falling, ShowFilter.Low, ShowFilter.New };
+    private static readonly string[] FilterKeys = { "RRP_Filter_Trending", "RRP_Filter_Falling", "RRP_Filter_Low", "RRP_Filter_New" };
     private static SettingsCards? cards;
     private static Vector2 leftScroll;
     private static Vector2 rightScroll;
@@ -83,7 +84,7 @@ public static class SettingsPage
         }
 
         listing.Gap(4f);
-        if (Button(listing, "RRP_ShowHiddenList".Translate(Settings.hidden.Count), HiddenTex))
+        if (Button(listing, Translations.Of("RRP_ShowHiddenList", Settings.hidden.Count), HiddenTex))
         {
             cards!.Later(() => Find.WindowStack.Add(new Window_OrganizeResources(Window_OrganizeResources.ShowHidden)));
         }
@@ -98,17 +99,17 @@ public static class SettingsPage
     private static void Display(Listing_Standard listing)
     {
         Rect line = listing.GetRect(30f);
-        cards!.Dropdown(line, "RRP_Mode".Translate(), ReadoutPanel.ModeLabel(Settings.mode), ModeTex, "RRP_ModeSettingTip".Translate(), ModeChoices);
+        cards!.Dropdown(line, "RRP_Mode".Translate(), ReadoutPanel.ModeTitle(Settings.mode), ModeTex, "RRP_ModeSettingTip".Translate(), ModeChoices);
         listing.Gap(4f);
         Tick(listing, "RRP_ShowNames", ref Settings.showNames);
         cards.Slider(listing, "RRP_Width".Translate(), "RRP_WidthTip".Translate(), Settings.width, ReadoutSettings.MinWidth, ReadoutSettings.MaxWidth, 10f,
-            value => Mathf.RoundToInt(value).ToString(), ReadoutSettings.UsualWidth, value =>
+            value => Mathf.RoundToInt(value).ToStringCached(), ReadoutSettings.UsualWidth, value =>
             {
                 Settings.width = value;
                 Settings.Changed();
             });
         cards.Slider(listing, "RRP_Opacity".Translate(), "RRP_OpacityTip".Translate(), Settings.opacity, ReadoutSettings.MinOpacity, 1f, 0.05f,
-            value => Mathf.RoundToInt(value * 100f) + "%", ReadoutSettings.DefaultOpacity, value =>
+            value => Translations.Of("RRP_Percent", Mathf.RoundToInt(value * 100f)), ReadoutSettings.DefaultOpacity, value =>
             {
                 Settings.opacity = value;
                 Settings.Changed();
@@ -125,8 +126,8 @@ public static class SettingsPage
             ReadoutMode captured = mode;
             section.items.Add(new ChoiceItem
             {
-                label = ReadoutPanel.ModeLabel(mode),
-                tip = ("RRP_Mode_" + mode + "Tip").Translate(),
+                label = ReadoutPanel.ModeTitle(mode),
+                tip = ReadoutPanel.ModeTip(mode),
                 on = Settings.mode == mode,
                 action = () =>
                 {
@@ -143,7 +144,7 @@ public static class SettingsPage
     {
         Tick(listing, "RRP_CountHiddenInTotals", ref Settings.countHiddenInTotals);
         Tick(listing, "RRP_CountCarried", ref Settings.countCarried);
-        if (SettingsCards.ResetButton(listing, "RRP_ClearCountAll".Translate(Settings.countAll.Count), Settings.countAll.Count > 0, "RRP_ClearCountAllTip".Translate(), "RRP_NothingToClear".Translate()))
+        if (SettingsCards.ResetButton(listing, Translations.Of("RRP_ClearCountAll", Settings.countAll.Count), Settings.countAll.Count > 0, "RRP_ClearCountAllTip".Translate(), "RRP_NothingToClear".Translate()))
         {
             Settings.countAll.Clear();
             Settings.Changed();
@@ -154,7 +155,7 @@ public static class SettingsPage
     {
         Tick(listing, "RRP_Trends", ref Settings.trends);
         cards!.Slider(listing, "RRP_TrendHours".Translate(), "RRP_TrendHoursTip".Translate(), Settings.trendHours, ReadoutSettings.MinTrendHours, ReadoutSettings.MaxTrendHours, 6f,
-            value => "RRP_Hours".Translate(Mathf.RoundToInt(value)), ReadoutSettings.UsualTrendHours, value =>
+            value => Translations.Of("RRP_Hours", Mathf.RoundToInt(value)), ReadoutSettings.UsualTrendHours, value =>
             {
                 Settings.trendHours = Mathf.RoundToInt(value);
                 Settings.Changed();
@@ -163,7 +164,7 @@ public static class SettingsPage
         bool trends = Settings.trends;
         TickIf(listing, "RRP_HoverChart", ref Settings.hoverChart, trends, "RRP_NeedsTrends");
         Greyed(trends && Settings.hoverChart, () => cards.Slider(listing, "RRP_ChartDays".Translate(), "RRP_ChartDaysTip".Translate(), Settings.chartDays,
-            ReadoutSettings.MinChartDays, ReadoutSettings.MaxChartDays, 1f, value => "RRP_Days".Translate(Mathf.RoundToInt(value)), ReadoutSettings.UsualChartDays, value =>
+            ReadoutSettings.MinChartDays, ReadoutSettings.MaxChartDays, 1f, value => Translations.Of("RRP_Days", Mathf.RoundToInt(value)), ReadoutSettings.UsualChartDays, value =>
             {
                 Settings.chartDays = Mathf.RoundToInt(value);
                 Settings.Changed();
@@ -176,19 +177,20 @@ public static class SettingsPage
     private static void Filter(Listing_Standard listing)
     {
         SettingsCards.Hint(listing, "RRP_FilterHint".Translate());
-        foreach (ShowFilter kind in FilterKinds)
+        for (int i = 0; i < FilterKinds.Length; i++)
         {
-            string key = "RRP_Filter_" + kind;
+            ShowFilter kind = FilterKinds[i];
+            string key = FilterKeys[i];
             bool available = kind == ShowFilter.Low || (kind == ShowFilter.New ? Settings.newMarks : Settings.trends);
             bool on = (Settings.filters & kind) != 0;
             bool before = on;
             if (available)
             {
-                SettingsCards.Tick(listing, key.Translate(), ref on, (key + "Tip").Translate());
+                SettingsCards.Tick(listing, Translations.Of(key), ref on, Translations.Tip(key));
             }
             else
             {
-                SettingsCards.Tick(listing, null, Theme.TextDim, key.Translate(), ref on, (kind == ShowFilter.New ? "RRP_NeedsNewMarks" : "RRP_NeedsTrends").Translate(), false);
+                SettingsCards.Tick(listing, null, Theme.TextDim, Translations.Of(key), ref on, Translations.Of(kind == ShowFilter.New ? "RRP_NeedsNewMarks" : "RRP_NeedsTrends"), false);
             }
 
             if (on != before)
@@ -202,7 +204,7 @@ public static class SettingsPage
         Tick(listing, "RRP_Filtering", ref Settings.filtering);
         Tick(listing, "RRP_PinnedIgnoreFilter", ref Settings.pinnedIgnoreFilter);
         cards!.Slider(listing, "RRP_NearPercent".Translate(), "RRP_NearPercentTip".Translate(), Settings.nearPercent, 0f, ReadoutSettings.MaxNearPercent, 5f,
-            value => Mathf.RoundToInt(value) + "%", ReadoutSettings.UsualNearPercent, value =>
+            value => Translations.Of("RRP_Percent", Mathf.RoundToInt(value)), ReadoutSettings.UsualNearPercent, value =>
             {
                 Settings.nearPercent = Mathf.RoundToInt(value);
                 Settings.Changed();
@@ -214,7 +216,7 @@ public static class SettingsPage
         Tick(listing, "RRP_NewMarks", ref Settings.newMarks);
         TickIf(listing, "RRP_BackInStock", ref Settings.backInStock, Settings.newMarks, "RRP_NeedsNewMarks");
         Greyed(Settings.newMarks, () => cards!.Slider(listing, "RRP_NewHours".Translate(), "RRP_NewHoursTip".Translate(), Settings.newHours,
-            ReadoutSettings.MinNewHours, ReadoutSettings.MaxNewHours, 1f, value => "RRP_Hours".Translate(Mathf.RoundToInt(value)), ReadoutSettings.UsualNewHours, value =>
+            ReadoutSettings.MinNewHours, ReadoutSettings.MaxNewHours, 1f, value => Translations.Of("RRP_Hours", Mathf.RoundToInt(value)), ReadoutSettings.UsualNewHours, value =>
             {
                 Settings.newHours = Mathf.RoundToInt(value);
                 Settings.Changed();
@@ -231,7 +233,7 @@ public static class SettingsPage
         }
 
         bool shown = value;
-        SettingsCards.Tick(listing, null, Theme.TextDim, key.Translate(), ref shown, needs.Translate(), false);
+        SettingsCards.Tick(listing, null, Theme.TextDim, Translations.Of(key), ref shown, Translations.Of(needs), false);
     }
 
     // Draws a control greyed out and inert unless enabled.
@@ -259,7 +261,7 @@ public static class SettingsPage
     private static void Stock(Listing_Standard listing)
     {
         Tick(listing, "RRP_LowStockAlertSetting", ref Settings.lowStockAlert);
-        if (SettingsCards.ResetButton(listing, "RRP_ClearMinimums".Translate(Settings.minimums.Count), Settings.minimums.Count > 0, "RRP_ClearMinimumsTip".Translate(), "RRP_NothingToClear".Translate()))
+        if (SettingsCards.ResetButton(listing, Translations.Of("RRP_ClearMinimums", Settings.minimums.Count), Settings.minimums.Count > 0, "RRP_ClearMinimumsTip".Translate(), "RRP_NothingToClear".Translate()))
         {
             cards!.Confirm("RRP_ClearMinimumsConfirm".Translate(), () =>
             {
@@ -274,15 +276,13 @@ public static class SettingsPage
         foreach (ReadoutMode mode in Enum.GetValues(typeof(ReadoutMode)))
         {
             ReadoutMode captured = mode;
-            bool any = Settings.OrderFor(mode).Count > 0 || (mode == ReadoutMode.Categorized && Settings.parentOf.Count > 0)
-                || (mode == ReadoutMode.Grouped && (Settings.groupOrder.Count > 0 || Settings.groupOf.Count > 0));
-            if (SettingsCards.ResetButton(listing, "RRP_ResetOrder".Translate(ReadoutPanel.ModeLabel(mode)), any, "RRP_ResetOrderTip".Translate(), "RRP_NothingToReset".Translate()))
+            if (SettingsCards.ResetButton(listing, Translations.Of("RRP_ResetOrder", ReadoutPanel.ModeLabel(mode)), ReadoutMenu.HasOrder(mode), "RRP_ResetOrderTip".Translate(), "RRP_NothingToReset".Translate()))
             {
                 ReadoutMenu.ResetOrder(captured);
             }
         }
 
-        bool groups = Settings.customGroups.Count > 0 || Settings.groupLabels.Count > 0;
+        bool groups = Settings.customGroups.Count > 0 || Settings.groupLabels.Count > 0 || Settings.groupParents.Count > 0;
         if (SettingsCards.ResetButton(listing, "RRP_ResetGroups".Translate(), groups, "RRP_ResetGroupsTip".Translate(), "RRP_NothingToReset".Translate()))
         {
             cards!.Confirm("RRP_ResetGroupsConfirm".Translate(), () =>
@@ -293,17 +293,18 @@ public static class SettingsPage
                 }
 
                 Settings.groupLabels.Clear();
+                Settings.groupParents.Clear();
                 Settings.Changed();
             });
         }
 
-        if (SettingsCards.ResetButton(listing, "RRP_ShowAllHiddenCount".Translate(Settings.hidden.Count), Settings.hidden.Count > 0, "RRP_ShowAllHiddenTip".Translate(), "RRP_NothingToReset".Translate()))
+        if (SettingsCards.ResetButton(listing, Translations.Of("RRP_ShowAllHiddenCount", Settings.hidden.Count), Settings.hidden.Count > 0, "RRP_ShowAllHiddenTip".Translate(), "RRP_NothingToReset".Translate()))
         {
             Settings.hidden.Clear();
             Settings.Changed();
         }
 
-        if (SettingsCards.ResetButton(listing, "RRP_UnpinAll".Translate(Settings.pinned.Count), Settings.pinned.Count > 0, "RRP_UnpinAllTip".Translate(), "RRP_NothingToReset".Translate()))
+        if (SettingsCards.ResetButton(listing, Translations.Of("RRP_UnpinAll", Settings.pinned.Count), Settings.pinned.Count > 0, "RRP_UnpinAllTip".Translate(), "RRP_NothingToReset".Translate()))
         {
             Settings.pinned.Clear();
             Settings.Changed();
@@ -320,7 +321,7 @@ public static class SettingsPage
     private static void Tick(Listing_Standard listing, string key, ref bool value)
     {
         bool before = value;
-        SettingsCards.Tick(listing, key.Translate(), ref value, (key + "Tip").Translate());
+        SettingsCards.Tick(listing, Translations.Of(key), ref value, Translations.Tip(key));
         if (before != value)
         {
             Settings.Changed();

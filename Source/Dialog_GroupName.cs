@@ -1,14 +1,21 @@
 using System;
+using UIRethemed.Core;
 using UnityEngine;
 using Verse;
 
 namespace ResourceReadoutPlus;
 
 /// <summary>Asks for a group's name, for a new group or a rename.</summary>
-public class Dialog_GroupName : Window
+[StaticConstructorOnStartup]
+public class Dialog_GroupName : ThemedPopup
 {
     private const int MaxLength = 32;
     private const float ButtonHeight = 32f;
+    private const float FieldHeight = 30f;
+    private const string Field = "RRP_GroupName";
+
+    private static readonly Texture2D FolderTex = CoreWidgets.Icon("folder");
+    private static readonly Texture2D OkTex = CoreWidgets.Icon("check");
 
     private readonly string title;
     private readonly Action<string> accept;
@@ -19,37 +26,28 @@ public class Dialog_GroupName : Window
         this.title = title;
         this.accept = accept;
         name = current;
+        AsDialog();
         forcePause = false;
-        doCloseX = true;
-        closeOnClickedOutside = true;
-        absorbInputAroundWindow = true;
     }
 
-    public override Vector2 InitialSize => new Vector2(380f, 160f);
+    public override Vector2 InitialSize => new Vector2(380f, 170f);
 
-    public override void DoWindowContents(Rect inRect)
+    protected override string Part => "Resource Readout+ group name";
+
+    protected override void Contents(Rect inRect)
     {
-        Text.Font = GameFont.Medium;
-        Widgets.Label(new Rect(inRect.x, inRect.y, inRect.width - 30f, 34f), title);
-        Text.Font = GameFont.Small;
-
-        Rect field = new Rect(inRect.x, inRect.y + 44f, inRect.width, 30f);
-        GUI.SetNextControlName("RRP_GroupName");
-        string typed = Widgets.TextField(field, name);
-        if (typed.Length <= MaxLength)
+        Rect body = TitleBar(inRect, FolderTex, title, null, null);
+        Rect field = new Rect(body.x, body.y, body.width, FieldHeight);
+        SearchField.TextBox(field, ref name, Field, "", MaxLength);
+        if (Event.current.type == EventType.Repaint && GUI.GetNameOfFocusedControl() != Field)
         {
-            name = typed;
-        }
-
-        if (Event.current.type == EventType.Repaint && GUI.GetNameOfFocusedControl() != "RRP_GroupName")
-        {
-            UI.FocusControl("RRP_GroupName", this);
+            UI.FocusControl(Field, this);
         }
 
         bool enter = Event.current.type == EventType.KeyDown && (Event.current.keyCode == KeyCode.Return || Event.current.keyCode == KeyCode.KeypadEnter);
-        Rect ok = new Rect(inRect.xMax - 140f, inRect.yMax - ButtonHeight, 140f, ButtonHeight);
+        Rect ok = new Rect(body.xMax - 140f, body.yMax - ButtonHeight, 140f, ButtonHeight);
         bool valid = !name.Trim().NullOrEmpty();
-        if ((Widgets.ButtonText(ok, "OK".Translate(), active: valid) || enter) && valid)
+        if ((CoreWidgets.Button(ok, "OK".Translate(), OkTex, enabled: valid) || enter) && valid)
         {
             accept(name.Trim());
             if (enter)

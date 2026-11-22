@@ -95,13 +95,39 @@ public class ReadoutSettings : ModSettings
     public List<string> openCategories = new List<string>();
     public List<string> openFamilies = new List<string>();
 
-
     // Bumped by every change; caches rebuild on the next read.
     public int version;
+
+    // Changes are written to disk at most this often, in real seconds; later ones wait for FlushIfDue or Flush.
+    private const float WriteDelay = 2f;
+    private bool unsaved;
+    private float lastWrite = -WriteDelay;
 
     public void Changed()
     {
         version++;
+        unsaved = true;
+        FlushIfDue();
+    }
+
+    // Core calls this every frame before windows draw.
+    public void FlushIfDue()
+    {
+        if (unsaved && UnityEngine.Time.realtimeSinceStartup - lastWrite >= WriteDelay)
+        {
+            Flush();
+        }
+    }
+
+    public void Flush()
+    {
+        if (!unsaved)
+        {
+            return;
+        }
+
+        unsaved = false;
+        lastWrite = UnityEngine.Time.realtimeSinceStartup;
         ReadoutMod.Instance?.WriteSettings();
     }
 

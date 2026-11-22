@@ -89,19 +89,6 @@ public static class ReadoutGroups
         return ByKey.TryGetValue(key, out GroupInfo? group) ? group : null;
     }
 
-    public static bool IsBuiltin(string key)
-    {
-        foreach ((string builtinKey, _, _, _, _) in Builtin)
-        {
-            if (builtinKey == key)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     // True when the group is the ancestor or somewhere inside it.
     public static bool IsWithin(string group, string ancestor)
     {

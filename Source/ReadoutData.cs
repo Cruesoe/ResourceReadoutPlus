@@ -21,6 +21,7 @@ public static partial class ReadoutData
 
     public static string search = "";
     public static int Version;
+    private static readonly Predicate<ThingDef> SearchHitDef = SearchHit;
 
     private static Map? builtMap;
     private static int builtStamp = -1;
@@ -52,11 +53,6 @@ public static partial class ReadoutData
     private static ReadoutMode ranksFor = (ReadoutMode)(-1);
 
     private static ReadoutSettings Settings => ReadoutMod.Settings;
-
-    public static void SetDirty()
-    {
-        builtMap = null;
-    }
 
     public static void Forget()
     {
@@ -595,7 +591,7 @@ public static partial class ReadoutData
             if (Keys.ThingOf(key) is ThingDef thing && Counts.ContainsKey(thing))
             {
                 keys.Add(key);
-                if (!filtering || Settings.pinnedIgnoreFilter || Matches(thing))
+                if ((!filtering || Settings.pinnedIgnoreFilter || Matches(thing)) && SearchHit(thing))
                 {
                     AddThing(map, thing, 0, Keys.PinnedList, key, draggable: true);
                 }
@@ -614,7 +610,7 @@ public static partial class ReadoutData
                 if (unit.members.Count > 0)
                 {
                     keys.Add(key);
-                    if (!filtering || Settings.pinnedIgnoreFilter || LowMatch(key) || unit.members.Exists(MatchesDef))
+                    if ((!filtering || Settings.pinnedIgnoreFilter || LowMatch(key) || unit.members.Exists(MatchesDef)) && unit.members.Exists(SearchHitDef))
                     {
                         AddPinnedFamily(map, unit);
                     }
@@ -665,17 +661,27 @@ public static partial class ReadoutData
         }
     }
 
+    // Hidden rows stay out, and pinned ones already show above, filtered by the search.
     private static void BuildSearch(Map map)
     {
         foreach (ThingDef def in Resources)
         {
-            int count = CountOf(def);
-            bool shown = filtering ? Matches(def) : count > 0 || def.resourceReadoutAlwaysShow || (Settings.showZero && def.PlayerAcquirable) || LowKeys.Contains(Keys.Of(def));
-            if (shown && def.label != null && def.label.IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0)
+            string key = Keys.Of(def);
+            if (Pinned.Contains(key) || (FamilyOf(def) is ThingCategoryDef family && Pinned.Contains(FamilyKey(family))))
             {
-                AddThing(map, def, 0, "", Keys.Of(def), draggable: false);
+                continue;
+            }
+
+            if (SearchHit(def) && Visible(def, CountOf(def)))
+            {
+                AddThing(map, def, 0, "", key, draggable: false);
             }
         }
+    }
+
+    private static bool SearchHit(ThingDef def)
+    {
+        return search.NullOrEmpty() || (def.label != null && def.label.IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0);
     }
 
     private static void BuildSimple(Map map)

@@ -1,5 +1,6 @@
 using System;
 using HarmonyLib;
+using UIRethemed.Core;
 using UnityEngine;
 using Verse;
 
@@ -18,6 +19,7 @@ public class ReadoutMod : Mod
     {
         Instance = this;
         Settings = GetSettings<ReadoutSettings>();
+        WindowHooks.BeforeWindows(() => Settings.FlushIfDue());
         Patch();
         LongEventHandler.ExecuteWhenFinished(Startup);
     }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Verse;
 
 namespace ResourceReadoutPlus;
@@ -23,7 +24,7 @@ public static class Keys
     public static string GroupsOf(string? groupKey) => GroupsList + (groupKey ?? "");
 
     // Session lifetime: defs never change while the game runs.
-    private static readonly System.Collections.Generic.Dictionary<Def, string> Cached = new System.Collections.Generic.Dictionary<Def, string>();
+    private static readonly Dictionary<Def, string> Cached = new Dictionary<Def, string>();
 
     public static string Of(ThingDef def)
     {

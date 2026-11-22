@@ -40,13 +40,7 @@ public class ResourceTrends : TrendBook
         return SeriesOf(Id(map, def), Series);
     }
 
-    // Change from the sample at the start of the window to now; false without enough history.
-    public bool Change(Map map, ThingDef def, int current, int window, out int change)
-    {
-        return Change(map, def, current, window, out change, out _);
-    }
-
-    // As above, with the ticks between the sample compared against and now.
+    // Change from the sample at the start of the window to now, and the ticks between them; false without enough history.
     public bool Change(Map map, ThingDef def, int current, int window, out int change, out int elapsed)
     {
         change = 0;

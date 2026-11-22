@@ -14,8 +14,6 @@ public static partial class ReadoutPanel
     private static Vector2 pressAt;
     private static bool dragging;
 
-    private static ReadoutSettings S => ReadoutMod.Settings;
-
     private static void ResetPress()
     {
         pressRow = null;
@@ -113,7 +111,7 @@ public static partial class ReadoutPanel
         }
 
         // The filter shows everything inside headers and families open, so clicking them does nothing while it is on.
-        if (S.Filtering && row.kind != RowKind.Item)
+        if (Settings.Filtering && row.kind != RowKind.Item)
         {
             return;
         }
@@ -121,13 +119,13 @@ public static partial class ReadoutPanel
         switch (row.kind)
         {
             case RowKind.Group:
-                Toggle(S.foldedGroups, row.key);
+                Toggle(Settings.foldedGroups, row.key);
                 break;
             case RowKind.Category:
-                Toggle(S.openCategories, row.key);
+                Toggle(Settings.openCategories, row.key);
                 break;
             case RowKind.Family:
-                Toggle(S.openFamilies, row.key);
+                Toggle(Settings.openFamilies, row.key);
                 break;
             case RowKind.Item when row.def != null:
                 ReadoutJump.Next(Find.CurrentMap, row.def);
@@ -137,7 +135,7 @@ public static partial class ReadoutPanel
         }
 
         SoundDefOf.Tick_Low.PlayOneShotOnCamera();
-        S.Changed();
+        Settings.Changed();
     }
 
     private static void Toggle(List<string> list, string key)
@@ -265,8 +263,8 @@ public static partial class ReadoutPanel
         }
 
         Place(order, rowKey, after);
-        SaveOrder(S.groupOrder, order);
-        S.Changed();
+        SaveOrder(Settings.groupOrder, order);
+        Settings.Changed();
     }
 
     private static void Move(Row dragged, string targetList, string? after)
@@ -278,17 +276,17 @@ public static partial class ReadoutPanel
                 return;
             }
 
-            Place(S.pinned, dragged.unit, after);
-            S.Changed();
+            Place(Settings.pinned, dragged.unit, after);
+            Settings.Changed();
             return;
         }
 
         if (dragged.list == Keys.PinnedList)
         {
-            S.pinned.Remove(dragged.unit);
+            Settings.pinned.Remove(dragged.unit);
         }
 
-        bool moved = S.mode switch
+        bool moved = Settings.mode switch
         {
             ReadoutMode.Grouped => MoveGrouped(dragged, targetList),
             ReadoutMode.Categorized => MoveCategorized(dragged, targetList),
@@ -299,10 +297,10 @@ public static partial class ReadoutPanel
         {
             List<string> order = new List<string>(ReadoutData.ListUnits.TryGetValue(targetList, out List<string>? units) ? units : new List<string>());
             Place(order, dragged.unit, after);
-            SaveOrder(S.OrderFor(S.mode), order);
+            SaveOrder(Settings.OrderFor(Settings.mode), order);
         }
 
-        S.Changed();
+        Settings.Changed();
     }
 
     private static bool MoveGrouped(Row dragged, string targetList)
@@ -332,11 +330,11 @@ public static partial class ReadoutPanel
         string key = Keys.Of(def);
         if (group == ReadoutGroups.BuiltinGroupOf(def))
         {
-            S.groupOf.Remove(key);
+            Settings.groupOf.Remove(key);
         }
         else
         {
-            S.groupOf[key] = group;
+            Settings.groupOf[key] = group;
         }
     }
 
@@ -362,11 +360,11 @@ public static partial class ReadoutPanel
 
         if (ReadoutData.IsUsualParent(def, parent))
         {
-            S.parentOf.Remove(dragged.key);
+            Settings.parentOf.Remove(dragged.key);
         }
         else
         {
-            S.parentOf[dragged.key] = parent == null ? Keys.Top : targetList;
+            Settings.parentOf[dragged.key] = parent == null ? Keys.Top : targetList;
         }
 
         return true;
