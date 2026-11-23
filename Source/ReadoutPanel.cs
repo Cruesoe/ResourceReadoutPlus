@@ -45,6 +45,12 @@ public static partial class ReadoutPanel
     private static float contentHeight;
     private static bool interactive;
 
+    // Unfold on hover: open now, kept folded until the mouse leaves after a manual fold, and when the panel was last in use.
+    private const float HoverFoldDelay = 0.4f;
+    private static bool hoverOpen;
+    private static bool hoverRearm;
+    private static float lastBusy;
+
     // Where the panel ended on the last frame it was drawn, for placing the top-left messages beside it.
     private const float MessageGap = 8f;
     private static float drawnRight;
@@ -70,6 +76,8 @@ public static partial class ReadoutPanel
     {
         scroll = Vector2.zero;
         searching = false;
+        hoverOpen = false;
+        hoverRearm = false;
         ResetPress();
     }
 
@@ -170,34 +178,52 @@ public static partial class ReadoutPanel
         FilterKey();
         Map map = Find.CurrentMap;
         ReadoutData.Ensure(map);
-        interactive = !Find.WindowStack.MouseObscuredNow;
+        interactive = !Find.WindowStack.MouseObscuredNow && !OverInspectTabs();
 
         List<Row> rows = ReadoutData.Rows;
         contentHeight = Mathf.Max(RowHeight, rows.Count * RowHeight);
-        float width = Settings.folded ? SidePanel.FoldedWidth : Settings.showNames ? Settings.width : NarrowWidth;
+        bool titled = Settings.showTitle;
+        float openWidth = Settings.showNames ? Settings.width : NarrowWidth;
         float most = UI.screenHeight - Top - BottomRoom;
-        float wanted = Settings.folded ? FoldedHeight : TitleHeight + Gap * 2f + (searching ? SearchHeight + Gap : 0f) + contentHeight;
-        panelRect = new Rect(Left, Top, width, Mathf.Min(wanted, most));
+        float openHeight = (titled ? TitleHeight : 0f) + Gap * 2f + (searching ? SearchHeight + Gap : 0f) + contentHeight;
+        Rect openRect = new Rect(Left, Top, openWidth, Mathf.Min(openHeight, most));
+        Rect foldedRect = new Rect(Left, Top, SidePanel.FoldedWidth, FoldedHeight);
+        bool wasFolded = Settings.autoFold ? HoverFolded(openRect, foldedRect) : Settings.folded;
+        panelRect = wasFolded ? foldedRect : openRect;
         drawnRight = panelRect.xMax;
         drawnFrame = Time.frameCount;
 
-        bool folded = Settings.folded;
+        bool folded = wasFolded;
         float surface = CoreWidgets.SurfaceAlpha;
         CoreWidgets.SurfaceAlpha = Opacity;
         try
         {
-            // The title icon only when the tools leave room for it; the folded strip always has it. The open panel has no title text, only the folded strip's tooltip names it.
-            Texture2D? icon = folded || width - FoldRoom - ToolsWidth >= IconRoom ? TitleTex : null;
-            bool open = SidePanel.Begin(panelRect, folded ? title : null, icon, ref folded, SidePanel.Side.Left, out Rect inner, out Rect titleBar, out float right, tools: ToolsWidth);
-            if (folded != Settings.folded)
+            bool open;
+            Rect inner;
+            if (folded || titled)
             {
-                Settings.folded = folded;
-                Settings.Changed();
+                // The title icon only when the tools leave room for it; the folded strip always has it. The open panel has no title text, only the folded strip's tooltip names it.
+                Texture2D? icon = folded || openWidth - FoldRoom - ToolsWidth >= IconRoom ? TitleTex : null;
+                open = SidePanel.Begin(panelRect, folded ? title : null, icon, ref folded, SidePanel.Side.Left, out inner, out Rect titleBar, out float right, tools: ToolsWidth);
+                if (open)
+                {
+                    TitleTools(titleBar, right);
+                }
+            }
+            else
+            {
+                Rounded.Fill(panelRect, Faces.Fade(Theme.BGLight, Opacity));
+                inner = panelRect.ContractedBy(Gap);
+                open = true;
+            }
+
+            if (folded != wasFolded)
+            {
+                FoldChanged(folded);
             }
 
             if (open)
             {
-                TitleTools(titleBar, right);
                 DrawBody(inner, rows);
             }
         }
@@ -208,8 +234,77 @@ public static partial class ReadoutPanel
 
         if (interactive)
         {
+            // Without the title bar, right-clicking the panel away from a row opens the panel menu.
+            if (!folded && !titled && Event.current.type == EventType.MouseDown && Event.current.button == 1 && Mouse.IsOver(panelRect))
+            {
+                Event.current.Use();
+                ReadoutMenu.OpenPanel();
+            }
+
             CoreWidgets.TakeClicks(panelRect);
         }
+    }
+
+    // Folded unless the mouse is over the panel or the panel is in use; folds again a moment after the mouse leaves.
+    private static bool HoverFolded(Rect openRect, Rect foldedRect)
+    {
+        float now = Time.realtimeSinceStartup;
+        bool over = interactive && Mouse.IsOver(hoverOpen ? openRect : foldedRect);
+        if (!over && !hoverOpen)
+        {
+            hoverRearm = false;
+        }
+
+        bool busy = hoverOpen && (over || dragging || searching && GUIUtility.keyboardControl != 0 || PanelWindowOpen());
+        if (busy)
+        {
+            lastBusy = now;
+        }
+        else if (over && !hoverRearm)
+        {
+            hoverOpen = true;
+            lastBusy = now;
+        }
+        else if (hoverOpen && now - lastBusy > HoverFoldDelay)
+        {
+            hoverOpen = false;
+        }
+
+        return !hoverOpen;
+    }
+
+    // A menu or dialog opened from the panel is showing.
+    private static bool PanelWindowOpen()
+    {
+        WindowStack stack = Find.WindowStack;
+        return stack.IsOpen<ChoiceMenu>() || stack.IsOpen<Dialog_GroupName>() || stack.IsOpen<Dialog_MinimumStock>();
+    }
+
+    // The fold button or folded strip was clicked: saved when folding is manual, a temporary state when it follows the mouse.
+    private static void FoldChanged(bool folded)
+    {
+        if (Settings.autoFold)
+        {
+            hoverOpen = !folded;
+            hoverRearm = folded;
+            lastBusy = Time.realtimeSinceStartup;
+            return;
+        }
+
+        Settings.folded = folded;
+        Settings.Changed();
+    }
+
+    // True when the mouse is over the inspect pane's tab row, which is drawn later and can overlap the panel's foot (more so when a mod raises the pane).
+    private static bool OverInspectTabs()
+    {
+        if (Find.MainTabsRoot.OpenTab?.TabWindow is not IInspectPane pane)
+        {
+            return false;
+        }
+
+        Vector2 mouse = UI.MousePositionOnUIInverted;
+        return mouse.y >= pane.PaneTopY - InspectPaneUtility.TabHeight && mouse.x < InspectPaneUtility.PaneWidthFor(pane);
     }
 
     // The messages' left edge: right of the panel when it was drawn this frame or the last, else the base game's.
@@ -235,15 +330,23 @@ public static partial class ReadoutPanel
 
         if (CoreWidgets.TitleTool(titleBar, ref right, SearchTex, searchHint, searchTip, on: searching))
         {
-            searching = !searching;
-            if (!searching)
-            {
-                ReadoutData.search = "";
-            }
-            else
-            {
-                Failsafe.Later(() => GUI.FocusControl(SearchControl));
-            }
+            ToggleSearch();
+        }
+    }
+
+    public static bool Searching => searching;
+
+    // Opens the search field and focuses it, or closes it and clears the search.
+    public static void ToggleSearch()
+    {
+        searching = !searching;
+        if (!searching)
+        {
+            ReadoutData.search = "";
+        }
+        else
+        {
+            Failsafe.Later(() => GUI.FocusControl(SearchControl));
         }
     }
 

@@ -101,6 +101,8 @@ public static class SettingsPage
         Rect line = listing.GetRect(30f);
         cards!.Dropdown(line, "RRP_Mode".Translate(), ReadoutPanel.ModeTitle(Settings.mode), ModeTex, "RRP_ModeSettingTip".Translate(), ModeChoices);
         listing.Gap(4f);
+        Tick(listing, "RRP_ShowTitle", ref Settings.showTitle);
+        Tick(listing, "RRP_AutoFold", ref Settings.autoFold);
         Tick(listing, "RRP_ShowNames", ref Settings.showNames);
         cards.Slider(listing, "RRP_Width".Translate(), "RRP_WidthTip".Translate(), Settings.width, ReadoutSettings.MinWidth, ReadoutSettings.MaxWidth, 10f,
             value => Mathf.RoundToInt(value).ToStringCached(), ReadoutSettings.UsualWidth, value =>

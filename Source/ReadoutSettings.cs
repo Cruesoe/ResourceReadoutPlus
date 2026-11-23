@@ -34,6 +34,8 @@ public class ReadoutSettings : ModSettings
     public bool shortNumbers;
     public bool showZero;
     public bool folded;
+    public bool autoFold;
+    public bool showTitle = true;
     public float opacity = DefaultOpacity;
 
     // Counting
@@ -139,6 +141,8 @@ public class ReadoutSettings : ModSettings
         Scribe_Values.Look(ref shortNumbers, "shortNumbers", false);
         Scribe_Values.Look(ref showZero, "showZero", false);
         Scribe_Values.Look(ref folded, "folded", false);
+        Scribe_Values.Look(ref autoFold, "autoFold", false);
+        Scribe_Values.Look(ref showTitle, "showTitle", true);
         Scribe_Values.Look(ref opacity, "opacity", DefaultOpacity);
         Scribe_Values.Look(ref countHiddenInTotals, "countHiddenInTotals", true);
         Scribe_Values.Look(ref countCarried, "countCarried", false);

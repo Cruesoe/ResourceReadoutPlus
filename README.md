@@ -6,7 +6,7 @@ Replaces the resource list at the top left of the map with a panel in the look o
 - An organizer window for groups and resources: drag resources into order, hide or show them one by one, search every resource and move it to any group.
 - Look-alike items such as leathers, wools, stone blocks, fish and eggs combined into one row that opens to show each kind.
 - The base game's simple list and category tree as alternative modes, in the same look.
-- A cog on the panel for switching the list and opening the settings, and a background opacity slider.
+- A cog on the panel for switching the list and opening the settings, a background opacity slider, and options to unfold the panel only while the mouse is over it or hide its title bar so only the resources show.
 - Item names, row tooltips with storage, map-wide counts, value and recent change.
 - Click a row to jump to where it is stored; drag rows to reorder or regroup them.
 - Pin rows to the top, set minimum stock levels with a low-stock alert, view a resource's history, count everything on the map, hide rows and search the list.
