@@ -170,7 +170,7 @@ public static partial class ReadoutPanel
         FilterKey();
         Map map = Find.CurrentMap;
         ReadoutData.Ensure(map);
-        interactive = !Find.WindowStack.MouseObscuredNow;
+        interactive = !Find.WindowStack.MouseObscuredNow && !OverInspectTabs();
 
         List<Row> rows = ReadoutData.Rows;
         contentHeight = Mathf.Max(RowHeight, rows.Count * RowHeight);
@@ -210,6 +210,18 @@ public static partial class ReadoutPanel
         {
             CoreWidgets.TakeClicks(panelRect);
         }
+    }
+
+    // True when the mouse is over the inspect pane's tab row, which is drawn later and can overlap the panel's foot (more so when a mod raises the pane).
+    private static bool OverInspectTabs()
+    {
+        if (Find.MainTabsRoot.OpenTab?.TabWindow is not IInspectPane pane)
+        {
+            return false;
+        }
+
+        Vector2 mouse = UI.MousePositionOnUIInverted;
+        return mouse.y >= pane.PaneTopY - InspectPaneUtility.TabHeight && mouse.x < InspectPaneUtility.PaneWidthFor(pane);
     }
 
     // The messages' left edge: right of the panel when it was drawn this frame or the last, else the base game's.

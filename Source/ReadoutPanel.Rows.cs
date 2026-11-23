@@ -67,7 +67,7 @@ public static partial class ReadoutPanel
     private static void DrawHeader(Row row, Rect rect)
     {
         float opacity = Opacity;
-        float hover = ThemeMotion.Hover(rect, HeaderSalt, Mouse.IsOver(rect));
+        float hover = ThemeMotion.Hover(rect, HeaderSalt, interactive && Mouse.IsOver(rect));
         Rounded.Fill(rect, Faces.Fade(Theme.BG, opacity));
         Rounded.Border(rect, Faces.Fade(Color.Lerp(Color.Lerp(Theme.BGDark, Theme.HighlightGray, 0.35f), Theme.HighlightGray, hover * 0.5f), opacity));
         if (hover > 0f)
@@ -107,7 +107,7 @@ public static partial class ReadoutPanel
     private static void DrawThing(Row row, Rect rect, int index)
     {
         float opacity = Opacity;
-        float hover = ThemeMotion.Hover(rect, ThingSalt, Mouse.IsOver(rect));
+        float hover = ThemeMotion.Hover(rect, ThingSalt, interactive && Mouse.IsOver(rect));
         Color fill = index % 2 == 1 ? Color.Lerp(Theme.BG, Theme.BGDark, 0.5f) : Theme.BG;
         Rounded.Fill(rect, Faces.Fade(fill, opacity));
         if (hover > 0f)
