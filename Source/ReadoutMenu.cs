@@ -27,6 +27,7 @@ public static class ReadoutMenu
     private static readonly Texture2D OrganizeTex = CoreWidgets.Icon("list-checks");
     private static readonly Texture2D TopTex = CoreWidgets.Icon("arrow-line-up");
     private static readonly Texture2D FilterTex = CoreWidgets.Icon("funnel");
+    private static readonly Texture2D SearchTex = CoreWidgets.Icon("magnifying-glass");
     private static readonly Texture2D SeenTex = CoreWidgets.Icon("check");
 
     private static ReadoutSettings Settings => ReadoutMod.Settings;
@@ -57,6 +58,12 @@ public static class ReadoutMenu
         if (own.items.Count > 0)
         {
             sections.Add(own);
+        }
+
+        if (!Settings.showTitle)
+        {
+            sections.Add(TitleRows());
+            sections.Add(ModeRows());
         }
 
         sections.Add(ReadoutRows());
@@ -186,6 +193,8 @@ public static class ReadoutMenu
     private static ChoiceSection ReadoutRows()
     {
         ChoiceSection section = new ChoiceSection { title = "RRP_MenuReadout".Translate() };
+        section.items.Add(Tick("RRP_ShowTitle", Settings.showTitle, () => Settings.showTitle = !Settings.showTitle));
+        section.items.Add(Tick("RRP_AutoFold", Settings.autoFold, () => Settings.autoFold = !Settings.autoFold));
         section.items.Add(Tick("RRP_ShowNames", Settings.showNames, () => Settings.showNames = !Settings.showNames));
         section.items.Add(Tick("RRP_ShowZero", Settings.showZero, () => Settings.showZero = !Settings.showZero));
         section.items.Add(Tick("RRP_ShortNumbers", Settings.shortNumbers, () => Settings.shortNumbers = !Settings.shortNumbers));
@@ -416,7 +425,18 @@ public static class ReadoutMenu
 
     public static void OpenPanel()
     {
-        Find.WindowStack.Add(new ChoiceMenu("RRP_PanelMenu".Translate(), SettingsTex, () => new List<ChoiceSection> { ModeRows(), ReadoutRows() }));
+        Find.WindowStack.Add(new ChoiceMenu("RRP_PanelMenu".Translate(), SettingsTex, () => Settings.showTitle
+            ? new List<ChoiceSection> { ModeRows(), ReadoutRows() }
+            : new List<ChoiceSection> { TitleRows(), ModeRows(), ReadoutRows() }));
+    }
+
+    // The title bar's search and filter buttons, for when the title bar is hidden.
+    private static ChoiceSection TitleRows()
+    {
+        ChoiceSection section = new ChoiceSection { title = "RRP_MenuPanel".Translate() };
+        section.items.Add(new ChoiceItem { label = "RRP_SearchHint".Translate(), icon = SearchTex, tick = true, on = ReadoutPanel.Searching, tip = "RRP_SearchTip".Translate(), action = ReadoutPanel.ToggleSearch });
+        section.items.Add(Item("RRP_FilterMenu", FilterTex, OpenFilter));
+        return section;
     }
 
     private static ChoiceSection ModeRows()

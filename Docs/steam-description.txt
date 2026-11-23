@@ -22,7 +22,7 @@ No more columns of unlabeled icons: resources are sorted into groups you recogni
 [*][b]New resources:[/b] Resources stored for the first time get a mark, and so can ones back in stock after running out. Marks clear themselves after a day (adjustable) or when you click the row.
 [*][b]Count all on the map:[/b] Count everything lying on the map rather than just what's in storage, for a row, category or group, optionally including what colonists carry.
 [*][b]Hide and search:[/b] Hide rows you don't care about, show zero counts, and filter the list with the search box.
-[*][b]Settings cog and opacity:[/b] A cog on the panel switches the list, changes what rows show and opens the settings, where a slider sets how solid the background is.
+[*][b]Settings cog and opacity:[/b] A cog on the panel switches the list, changes what rows show and opens the settings, where a slider sets how solid the background is. The panel can also stay folded until you point at it, or drop its title bar so only the resources show.
 [*][b]Fold away:[/b] Fold the whole panel to a slim strip when you want the map clear.
 [*][b]Colors:[/b] The low stock, rising, falling and new colors can be changed in UI Rethemed - Core's theme settings.
 [/list]

@@ -111,6 +111,8 @@
   <RRP_NewGroup>New group...</RRP_NewGroup>
   <RRP_NewGroupTitle>New group</RRP_NewGroupTitle>
   <RRP_MenuReadout>Readout</RRP_MenuReadout>
+  <RRP_MenuPanel>Panel</RRP_MenuPanel>
+  <RRP_FilterMenu>Filter...</RRP_FilterMenu>
   <RRP_Unhide>Unhide... ({0})</RRP_Unhide>
   <RRP_UnhideTitle>Unhide</RRP_UnhideTitle>
   <RRP_ShowAllHidden>Show all hidden</RRP_ShowAllHidden>
@@ -184,6 +186,10 @@
   <RRP_ModeSettingTip>How the readout lists resources. The cog on its title bar switches too.</RRP_ModeSettingTip>
   <RRP_ShowNames>Show names</RRP_ShowNames>
   <RRP_ShowNamesTip>Shows each resource's name beside its count. Without names the readout is narrower.</RRP_ShowNamesTip>
+  <RRP_ShowTitle>Show title bar</RRP_ShowTitle>
+  <RRP_ShowTitleTip>Shows the title bar with the search, filter, list and fold buttons. Without it the panel shows only resources; right-click a row or the panel for search, filter and the list choices.</RRP_ShowTitleTip>
+  <RRP_AutoFold>Unfold on hover</RRP_AutoFold>
+  <RRP_AutoFoldTip>Keeps the panel folded until you point at it, and folds it again shortly after the mouse leaves.</RRP_AutoFoldTip>
   <RRP_Width>Width with names</RRP_Width>
   <RRP_WidthTip>How wide the readout is when it shows names.</RRP_WidthTip>
   <RRP_Opacity>Background opacity</RRP_Opacity>
