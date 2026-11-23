@@ -113,6 +113,7 @@
   <RRP_MenuReadout>Readout</RRP_MenuReadout>
   <RRP_MenuPanel>Panel</RRP_MenuPanel>
   <RRP_FilterMenu>Filter...</RRP_FilterMenu>
+  <RRP_FoldPanel>Fold panel</RRP_FoldPanel>
   <RRP_Unhide>Unhide... ({0})</RRP_Unhide>
   <RRP_UnhideTitle>Unhide</RRP_UnhideTitle>
   <RRP_ShowAllHidden>Show all hidden</RRP_ShowAllHidden>

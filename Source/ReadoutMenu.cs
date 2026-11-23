@@ -436,6 +436,15 @@ public static class ReadoutMenu
         ChoiceSection section = new ChoiceSection { title = "RRP_MenuPanel".Translate() };
         section.items.Add(new ChoiceItem { label = "RRP_SearchHint".Translate(), icon = SearchTex, tick = true, on = ReadoutPanel.Searching, tip = "RRP_SearchTip".Translate(), action = ReadoutPanel.ToggleSearch });
         section.items.Add(Item("RRP_FilterMenu", FilterTex, OpenFilter));
+        if (!Settings.autoFold)
+        {
+            section.items.Add(Item("RRP_FoldPanel", SidePanel.FoldLeftTex, () =>
+            {
+                Settings.folded = true;
+                Settings.Changed();
+            }));
+        }
+
         return section;
     }
 
