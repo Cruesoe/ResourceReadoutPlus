@@ -308,9 +308,9 @@ public static partial class ReadoutPanel
     }
 
     // The messages' left edge: right of the panel when it was drawn this frame or the last, else the base game's.
-    public static float MessagesX(float usual)
+    public static int MessagesX(int usual)
     {
-        return Time.frameCount - drawnFrame <= 1 ? Mathf.Max(usual, drawnRight + MessageGap) : usual;
+        return Time.frameCount - drawnFrame <= 1 ? Mathf.Max(usual, Mathf.CeilToInt(drawnRight + MessageGap)) : usual;
     }
 
     // The panel's background opacity, from the settings slider.

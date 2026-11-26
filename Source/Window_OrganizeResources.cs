@@ -16,7 +16,7 @@ public class Window_OrganizeResources : Window
     private const string Part = "Resource Readout+ organizer";
     private const float Pad = 8f;
     private const float TitleHeight = 40f;
-    private const float LeftWidth = 290f;
+    private const float LeftWidth = 300f;
     private const float RowHeight = 30f;
     private const float ToolSize = 28f;
     private const float SearchHeight = 28f;
@@ -33,7 +33,8 @@ public class Window_OrganizeResources : Window
     private static readonly Texture2D SubTex = CoreWidgets.Icon("list-plus");
     private static readonly Texture2D RenameTex = CoreWidgets.Icon("pencil");
     private static readonly Texture2D MoveTex = CoreWidgets.Icon("arrows-out-cardinal");
-    private static readonly Texture2D TopTex = CoreWidgets.Icon("arrow-line-up");
+    private static readonly Texture2D PromoteTex = CoreWidgets.Icon("arrow-left");
+    private static readonly Texture2D DemoteTex = CoreWidgets.Icon("arrow-right");
     private static readonly Texture2D UpTex = CoreWidgets.Icon("arrow-up");
     private static readonly Texture2D DownTex = CoreWidgets.Icon("arrow-down");
     private static readonly Texture2D DeleteTex = CoreWidgets.Icon("trash");
@@ -214,9 +215,14 @@ public class Window_OrganizeResources : Window
             ReadoutMenu.OpenGroupPicker("RRP_MoveGroupInto".Translate(), group.parent?.key ?? "", key, parent => ReadoutPanel.PlaceGroup(key, parent, LastChild(parent)), null);
         }
 
-        if (Tool(ref x, rect, TopTex, "RRP_MoveToTop", group?.parent != null))
+        if (Tool(ref x, rect, PromoteTex, "RRP_PromoteGroup", group?.parent != null))
         {
-            ReadoutPanel.PlaceGroup(group!.key, null, LastChild(null));
+            ReadoutPanel.Promote(group!);
+        }
+
+        if (Tool(ref x, rect, DemoteTex, "RRP_DemoteGroup", group != null && ReadoutPanel.GroupAbove(group) != null))
+        {
+            ReadoutPanel.Demote(group!);
         }
 
         List<GroupInfo>? siblings = group == null ? null : group.parent?.children ?? ReadoutGroups.TopLevel;

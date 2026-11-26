@@ -26,6 +26,8 @@ public static class ReadoutMenu
     private static readonly Texture2D SettingsTex = CoreWidgets.Icon("gear-six");
     private static readonly Texture2D OrganizeTex = CoreWidgets.Icon("list-checks");
     private static readonly Texture2D TopTex = CoreWidgets.Icon("arrow-line-up");
+    private static readonly Texture2D PromoteTex = CoreWidgets.Icon("arrow-left");
+    private static readonly Texture2D DemoteTex = CoreWidgets.Icon("arrow-right");
     private static readonly Texture2D FilterTex = CoreWidgets.Icon("funnel");
     private static readonly Texture2D SearchTex = CoreWidgets.Icon("magnifying-glass");
     private static readonly Texture2D SeenTex = CoreWidgets.Icon("check");
@@ -138,9 +140,19 @@ public static class ReadoutMenu
         GroupInfo? info = ReadoutGroups.Find(group);
         section.items.Add(Item("RRP_Rename", RenameTex, () => Find.WindowStack.Add(new Dialog_GroupName("RRP_RenameGroup".Translate(), info?.label ?? row.label, label => ReadoutGroups.Rename(group, label)))));
         section.items.Add(Item("RRP_NewSubgroup", NewTex, () => Find.WindowStack.Add(new Dialog_GroupName("RRP_NewSubgroupTitle".Translate(info?.label ?? row.label), "", label => ReadoutGroups.NewGroup(label, group)))));
+        if (info?.parent?.parent != null)
+        {
+            section.items.Add(Item("RRP_PromoteGroup", PromoteTex, () => ReadoutPanel.Promote(info)));
+        }
+
         if (info?.parent != null)
         {
             section.items.Add(Item("RRP_MoveToTop", TopTex, () => ReadoutPanel.PlaceGroup(group, null, ReadoutGroups.TopLevel.Count > 0 ? ReadoutGroups.TopLevel[ReadoutGroups.TopLevel.Count - 1].rowKey : null)));
+        }
+
+        if (info != null && ReadoutPanel.GroupAbove(info) != null)
+        {
+            section.items.Add(Item("RRP_DemoteGroup", DemoteTex, () => ReadoutPanel.Demote(info)));
         }
 
         section.items.Add(Item("RRP_SetMinimum", MinimumTex, () => Find.WindowStack.Add(new Dialog_MinimumStock(row.key, row.label))));

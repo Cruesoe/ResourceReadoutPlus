@@ -267,6 +267,33 @@ public static partial class ReadoutPanel
         Settings.Changed();
     }
 
+    // The group before this one among its siblings, which Demote moves it into.
+    public static GroupInfo? GroupAbove(GroupInfo group)
+    {
+        List<GroupInfo> siblings = group.parent?.children ?? ReadoutGroups.TopLevel;
+        int index = siblings.IndexOf(group);
+        return index > 0 ? siblings[index - 1] : null;
+    }
+
+    // Moves a group out of its parent, placing it just below the parent.
+    public static void Promote(GroupInfo group)
+    {
+        if (group.parent is GroupInfo parent)
+        {
+            PlaceGroup(group.key, parent.parent?.key, parent.rowKey);
+        }
+    }
+
+    // Moves a group to the end of the group above it.
+    public static void Demote(GroupInfo group)
+    {
+        if (GroupAbove(group) is GroupInfo above)
+        {
+            List<GroupInfo> children = above.children;
+            PlaceGroup(group.key, above.key, children.Count > 0 ? children[children.Count - 1].rowKey : null);
+        }
+    }
+
     private static void Move(Row dragged, string targetList, string? after)
     {
         if (targetList == Keys.PinnedList)
