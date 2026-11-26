@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Verse;
 
@@ -281,7 +282,7 @@ public static partial class ReadoutData
         MovedToTop.Clear();
         foreach (KeyValuePair<string, string> entry in Settings.parentOf)
         {
-            Def? def = (Def?)Keys.ThingOf(entry.Key) ?? (entry.Key.StartsWith(Keys.Category) ? Keys.CategoryOf(entry.Key) : null);
+            Def? def = (Def?)Keys.ThingOf(entry.Key) ?? (entry.Key.StartsWith(Keys.Category, StringComparison.Ordinal) ? Keys.CategoryOf(entry.Key) : null);
             if (def == null)
             {
                 continue;

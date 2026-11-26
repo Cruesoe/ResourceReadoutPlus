@@ -286,7 +286,7 @@ public static partial class ReadoutData
         {
             foreach (ThingDef def in own)
             {
-                if (InTotal(Keys.Of(def)))
+                if (ThingInTotal(def))
                 {
                     defs.Add(def);
                 }

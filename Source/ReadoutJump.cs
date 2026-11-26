@@ -71,5 +71,16 @@ public static class ReadoutJump
                 Found.Add(thing);
             }
         }
+
+        // Packed-up furniture lying outside storage, which counting all includes.
+        List<Thing> minified = map.listerThings.ThingsInGroup(ThingRequestGroup.MinifiedThing);
+        for (int i = 0; i < minified.Count; i++)
+        {
+            Thing thing = minified[i];
+            if (thing.GetInnerIfMinified().def == def && !thing.IsInAnyStorage() && !thing.Position.Fogged(map))
+            {
+                Found.Add(thing);
+            }
+        }
     }
 }

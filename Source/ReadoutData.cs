@@ -249,6 +249,12 @@ public static partial class ReadoutData
         return Settings.countHiddenInTotals || !Hidden.Contains(key);
     }
 
+    // A thing counts towards its group when neither it nor its look-alike row is hidden.
+    private static bool ThingInTotal(ThingDef def)
+    {
+        return InTotal(Keys.Of(def)) && (FamilyOf(def) is not ThingCategoryDef family || InTotal(FamilyKey(family)));
+    }
+
     private static int FamilyTotal(ThingCategoryDef family)
     {
         int total = 0;
@@ -271,7 +277,7 @@ public static partial class ReadoutData
         {
             foreach (ThingDef def in defs)
             {
-                if (InTotal(Keys.Of(def)))
+                if (ThingInTotal(def))
                 {
                     total += CountOf(def);
                 }
@@ -305,7 +311,7 @@ public static partial class ReadoutData
                 total = CountOf(thing);
                 label = thing.LabelCap;
             }
-            else if (key.StartsWith(Keys.Family) && Keys.CategoryOf(key) is ThingCategoryDef family)
+            else if (key.StartsWith(Keys.Family, StringComparison.Ordinal) && Keys.CategoryOf(key) is ThingCategoryDef family)
             {
                 total = FamilyTotal(family);
                 label = family.LabelCap;
@@ -596,7 +602,7 @@ public static partial class ReadoutData
                     AddThing(map, thing, 0, Keys.PinnedList, key, draggable: true);
                 }
             }
-            else if (key.StartsWith(Keys.Family) && Keys.CategoryOf(key) is ThingCategoryDef family)
+            else if (key.StartsWith(Keys.Family, StringComparison.Ordinal) && Keys.CategoryOf(key) is ThingCategoryDef family)
             {
                 ReadoutUnit unit = new ReadoutUnit { key = key, family = family };
                 foreach (ThingDef def in Resources)

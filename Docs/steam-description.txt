@@ -5,7 +5,7 @@ No more columns of unlabeled icons: resources are sorted into groups you recogni
 [h2]Features[/h2]
 [list]
 [*][b]Groups:[/b] Essentials, food (meat and fish, vegetables, animal products, animal feed), meals, medicine, drugs (social, hard, medical, serums and catalysts), textiles, materials, manufactured goods, ammo (mortar shells and any mod ammo), items and waste, each with its total. Click a group to fold it.
-[*][b]Your own groups:[/b] Make groups and subgroups, rename any group, and drag groups into a new order or inside one another.
+[*][b]Your own groups:[/b] Make groups and subgroups, rename any group, and drag groups into a new order or inside one another, or move a group in or out a level from the organizer or its right-click menu.
 [*][b]Organizer:[/b] A window listing every group and resource. Drag resources into order, hide or show them one by one, search every resource and move it to any group, and bring back anything hidden by mistake.
 [*][b]Look-alikes combined:[/b] Leathers, wools, stone blocks, fish and eggs show as one row with the total, which opens to show each kind. Combine any other category from the right-click menu.
 [*][b]Three lists:[/b] Grouped, simple or the base game's category tree, switched from the cog on the panel's title bar. Every list gets names, tooltips and the features below.

@@ -16,7 +16,7 @@ public class Window_OrganizeResources : Window
     private const string Part = "Resource Readout+ organizer";
     private const float Pad = 8f;
     private const float TitleHeight = 40f;
-    private const float LeftWidth = 290f;
+    private const float LeftWidth = 300f;
     private const float RowHeight = 30f;
     private const float ToolSize = 28f;
     private const float SearchHeight = 28f;
@@ -33,7 +33,8 @@ public class Window_OrganizeResources : Window
     private static readonly Texture2D SubTex = CoreWidgets.Icon("list-plus");
     private static readonly Texture2D RenameTex = CoreWidgets.Icon("pencil");
     private static readonly Texture2D MoveTex = CoreWidgets.Icon("arrows-out-cardinal");
-    private static readonly Texture2D TopTex = CoreWidgets.Icon("arrow-line-up");
+    private static readonly Texture2D PromoteTex = CoreWidgets.Icon("arrow-left");
+    private static readonly Texture2D DemoteTex = CoreWidgets.Icon("arrow-right");
     private static readonly Texture2D UpTex = CoreWidgets.Icon("arrow-up");
     private static readonly Texture2D DownTex = CoreWidgets.Icon("arrow-down");
     private static readonly Texture2D DeleteTex = CoreWidgets.Icon("trash");
@@ -52,7 +53,7 @@ public class Window_OrganizeResources : Window
 
     // The right-hand list, rebuilt when settings, the view or the search change.
     private readonly List<ReadoutUnit> units = new List<ReadoutUnit>();
-    private readonly List<string> hiddenKeys = new List<string>();
+    private readonly List<(string key, string label, string kind, Texture? icon)> hiddenKeys = new List<(string, string, string, Texture?)>();
     private int builtFor = -1;
     private int notesFor = -1;
     private string builtView = "";
@@ -99,7 +100,7 @@ public class Window_OrganizeResources : Window
         if (Failsafe.Failed(Part))
         {
             Rounded.WindowBackground(inRect);
-            CoreWidgets.Empty(inRect, "RRP_OrganizeFailed".Translate());
+            CoreWidgets.Empty(inRect, Translations.Of("RRP_OrganizeFailed"));
             return;
         }
 
@@ -121,7 +122,7 @@ public class Window_OrganizeResources : Window
         SearchField.StopOnClickAway();
         Rounded.WindowBackground(inner);
         Rect rect = inner.ContractedBy(Pad);
-        CoreWidgets.TitleBar(new Rect(rect.x, rect.y, rect.width, TitleHeight), TitleTex, "RRP_OrganizeTitle".Translate(), float.MaxValue, close);
+        CoreWidgets.TitleBar(new Rect(rect.x, rect.y, rect.width, TitleHeight), TitleTex, Translations.Of("RRP_OrganizeTitle"), float.MaxValue, close);
         Rect body = new Rect(rect.x, rect.y + TitleHeight + Pad, rect.width, rect.height - TitleHeight - Pad);
         Rect left = new Rect(body.x, body.y, LeftWidth, body.height);
         Rect right = new Rect(left.xMax + Pad, body.y, body.width - LeftWidth - Pad, body.height);
@@ -133,7 +134,7 @@ public class Window_OrganizeResources : Window
 
     private void Tree(Rect rect)
     {
-        Rect panel = CoreWidgets.Panel(rect, "RRP_OrganizeGroups".Translate(), FolderTex);
+        Rect panel = CoreWidgets.Panel(rect, Translations.Of("RRP_OrganizeGroups"), FolderTex);
         Rect tools = new Rect(panel.x, panel.yMax - ToolSize, panel.width, ToolSize);
         Rect list = new Rect(panel.x, panel.y, panel.width, tools.y - 6f - panel.y);
 
@@ -143,7 +144,7 @@ public class Window_OrganizeResources : Window
         try
         {
             float y = 0f;
-            TreeRow(new Rect(0f, y, view.width, RowHeight), AllView, "RRP_OrganizeAll".Translate(), AllTex, 0, null);
+            TreeRow(new Rect(0f, y, view.width, RowHeight), AllView, Translations.Of("RRP_OrganizeAll"), AllTex, 0, null);
             y += RowHeight;
             TreeRow(new Rect(0f, y, view.width, RowHeight), HiddenView, Translations.Of("RRP_OrganizeHidden", Settings.hidden.Count), HiddenTex, 0, null);
             y += RowHeight;
@@ -193,7 +194,7 @@ public class Window_OrganizeResources : Window
         float x = rect.x;
         if (Tool(ref x, rect, NewTex, "RRP_NewGroup", true))
         {
-            Find.WindowStack.Add(new Dialog_GroupName("RRP_NewGroupTitle".Translate(), "", label => selected = ReadoutGroups.NewGroup(label)));
+            Find.WindowStack.Add(new Dialog_GroupName(Translations.Of("RRP_NewGroupTitle"), "", label => selected = ReadoutGroups.NewGroup(label)));
         }
 
         if (Tool(ref x, rect, SubTex, "RRP_NewSubgroup", group != null))
@@ -205,18 +206,23 @@ public class Window_OrganizeResources : Window
         if (Tool(ref x, rect, RenameTex, "RRP_Rename", group != null))
         {
             string key = group!.key;
-            Find.WindowStack.Add(new Dialog_GroupName("RRP_RenameGroup".Translate(), group.label, label => ReadoutGroups.Rename(key, label)));
+            Find.WindowStack.Add(new Dialog_GroupName(Translations.Of("RRP_RenameGroup"), group.label, label => ReadoutGroups.Rename(key, label)));
         }
 
         if (Tool(ref x, rect, MoveTex, "RRP_MoveGroupInto", group != null))
         {
             string key = group!.key;
-            ReadoutMenu.OpenGroupPicker("RRP_MoveGroupInto".Translate(), group.parent?.key ?? "", key, parent => ReadoutPanel.PlaceGroup(key, parent, LastChild(parent)), null);
+            ReadoutMenu.OpenGroupPicker(Translations.Of("RRP_MoveGroupInto"), group.parent?.key ?? "", key, parent => ReadoutPanel.PlaceGroup(key, parent, LastChild(parent)), null);
         }
 
-        if (Tool(ref x, rect, TopTex, "RRP_MoveToTop", group?.parent != null))
+        if (Tool(ref x, rect, PromoteTex, "RRP_PromoteGroup", group?.parent != null))
         {
-            ReadoutPanel.PlaceGroup(group!.key, null, LastChild(null));
+            ReadoutPanel.Promote(group!);
+        }
+
+        if (Tool(ref x, rect, DemoteTex, "RRP_DemoteGroup", group != null && ReadoutPanel.GroupAbove(group) != null))
+        {
+            ReadoutPanel.Demote(group!);
         }
 
         List<GroupInfo>? siblings = group == null ? null : group.parent?.children ?? ReadoutGroups.TopLevel;
@@ -261,7 +267,7 @@ public class Window_OrganizeResources : Window
     private void List(Rect rect)
     {
         GroupInfo? group = ReadoutGroups.Find(selected);
-        string title = selected == AllView ? "RRP_OrganizeAll".Translate() : selected == HiddenView ? Translations.Of("RRP_OrganizeHidden", Settings.hidden.Count) : group?.label ?? "";
+        string title = selected == AllView ? Translations.Of("RRP_OrganizeAll") : selected == HiddenView ? Translations.Of("RRP_OrganizeHidden", Settings.hidden.Count) : group?.label ?? "";
         Rect panel = CoreWidgets.Panel(rect, title, selected == AllView ? AllTex : selected == HiddenView ? HiddenTex : group?.icon);
         Rebuild();
 
@@ -269,13 +275,13 @@ public class Window_OrganizeResources : Window
         if (selected == AllView)
         {
             Rect line = new Rect(panel.x, panel.y, panel.width, SearchHeight);
-            SearchField.Draw(line, ref search, SearchControl, "RRP_SearchHint".Translate());
+            SearchField.Draw(line, ref search, SearchControl, Translations.Of("RRP_SearchHint"));
             body.yMin = line.yMax + 6f;
         }
         else
         {
             Rect hint = new Rect(panel.x + 4f, panel.y, panel.width - 8f, 24f);
-            CoreWidgets.Line(hint, (selected == HiddenView ? "RRP_OrganizeHiddenHint" : "RRP_OrganizeGroupHint").Translate(), Theme.TextDim);
+            CoreWidgets.Line(hint, Translations.Of(selected == HiddenView ? "RRP_OrganizeHiddenHint" : "RRP_OrganizeGroupHint"), Theme.TextDim);
             body.yMin = hint.yMax + 4f;
         }
 
@@ -289,7 +295,7 @@ public class Window_OrganizeResources : Window
         }
         else if (units.Count == 0)
         {
-            CoreWidgets.Empty(body, "RRP_OrganizeEmptyGroup".Translate());
+            CoreWidgets.Empty(body, Translations.Of("RRP_OrganizeEmptyGroup"));
         }
         else
         {
@@ -330,7 +336,7 @@ public class Window_OrganizeResources : Window
     {
         if (units.Count == 0)
         {
-            CoreWidgets.Empty(rect, "RRP_OrganizeNoMatch".Translate());
+            CoreWidgets.Empty(rect, Translations.Of("RRP_OrganizeNoMatch"));
             return;
         }
 
@@ -349,16 +355,16 @@ public class Window_OrganizeResources : Window
                 float right = PlainRow(row, i, unit.label, unit.note, IconOf(unit), ReadoutData.IsHidden(unit.key));
                 Rect eye = new Rect(right - 26f, Mathf.Round(row.center.y - 13f), 26f, 26f);
                 bool hidden = ReadoutData.IsHidden(unit.key);
-                if (CoreWidgets.IconButton(eye, hidden ? HiddenTex : ShowTex, (hidden ? "RRP_Show" : "RRP_Hide").Translate(), "RRP_ShowHideTip".Translate()))
+                if (CoreWidgets.IconButton(eye, hidden ? HiddenTex : ShowTex, Translations.Of(hidden ? "RRP_Show" : "RRP_Hide"), Translations.Of("RRP_ShowHideTip")))
                 {
                     ToggleHidden(unit.key);
                 }
 
                 Rect folder = new Rect(eye.x - 28f, eye.y, 26f, 26f);
-                if (CoreWidgets.IconButton(folder, FolderTex, "RRP_MoveToGroup".Translate(), "RRP_MoveToGroupTip".Translate()))
+                if (CoreWidgets.IconButton(folder, FolderTex, Translations.Of("RRP_MoveToGroup"), Translations.Of("RRP_MoveToGroupTip")))
                 {
                     Row target = RowOf(unit);
-                    ReadoutMenu.OpenGroupPicker("RRP_MoveToGroup".Translate(), unit.def != null ? ReadoutGroups.GroupOf(unit.def) : "", null,
+                    ReadoutMenu.OpenGroupPicker(Translations.Of("RRP_MoveToGroup"), unit.def != null ? ReadoutGroups.GroupOf(unit.def) : "", null,
                         key => ReadoutMenu.MoveToGroup(target, key), label => ReadoutMenu.MoveToGroup(target, ReadoutGroups.NewGroup(label)));
                 }
             }
@@ -373,7 +379,7 @@ public class Window_OrganizeResources : Window
     {
         if (hiddenKeys.Count == 0)
         {
-            CoreWidgets.Empty(rect, "RRP_OrganizeNothingHidden".Translate());
+            CoreWidgets.Empty(rect, Translations.Of("RRP_OrganizeNothingHidden"));
             return;
         }
 
@@ -382,11 +388,16 @@ public class Window_OrganizeResources : Window
         {
             for (int i = 0; i < hiddenKeys.Count; i++)
             {
-                string key = hiddenKeys[i];
+                (string key, string label, string kind, Texture? icon) = hiddenKeys[i];
                 Rect row = new Rect(0f, i * RowHeight, view.width, RowHeight);
-                float right = PlainRow(row, i, ReadoutMenu.LabelOf(key), KindOf(key), IconOf(key), false);
+                if (row.yMax < listScroll.y || row.y > listScroll.y + rect.height)
+                {
+                    continue;
+                }
+
+                float right = PlainRow(row, i, label, kind, icon, false);
                 Rect show = new Rect(right - 80f, Mathf.Round(row.center.y - 13f), 80f, 26f);
-                if (CoreWidgets.Button(show, "RRP_Show".Translate(), ShowTex))
+                if (CoreWidgets.Button(show, Translations.Of("RRP_Show"), ShowTex))
                 {
                     Settings.hidden.Remove(key);
                     Settings.Changed();
@@ -441,8 +452,12 @@ public class Window_OrganizeResources : Window
 
         if (selected == HiddenView)
         {
-            hiddenKeys.AddRange(Settings.hidden);
-            hiddenKeys.SortBy(key => ReadoutMenu.LabelOf(key));
+            foreach (string key in Settings.hidden)
+            {
+                hiddenKeys.Add((key, ReadoutMenu.LabelOf(key), KindOf(key), IconOf(key)));
+            }
+
+            hiddenKeys.SortBy(entry => entry.label);
             return;
         }
 
@@ -584,7 +599,7 @@ public class Window_OrganizeResources : Window
 
     private static string KindOf(string key)
     {
-        string kind = key.StartsWith(Keys.Group) ? "RRP_KindGroup" : key.StartsWith(Keys.Category) ? "RRP_KindCategory" : key.StartsWith(Keys.Family) ? "RRP_KindFamily" : "RRP_KindThing";
-        return kind.Translate();
+        string kind = key.StartsWith(Keys.Group, StringComparison.Ordinal) ? "RRP_KindGroup" : key.StartsWith(Keys.Category, StringComparison.Ordinal) ? "RRP_KindCategory" : key.StartsWith(Keys.Family, StringComparison.Ordinal) ? "RRP_KindFamily" : "RRP_KindThing";
+        return Translations.Of(kind);
     }
 }

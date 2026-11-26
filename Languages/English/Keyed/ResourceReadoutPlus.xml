@@ -125,6 +125,8 @@
   <RRP_NewSubgroup>New subgroup...</RRP_NewSubgroup>
   <RRP_NewSubgroupTitle>New group inside {0}</RRP_NewSubgroupTitle>
   <RRP_MoveToTop>Move to the top level</RRP_MoveToTop>
+  <RRP_PromoteGroup>Move out a level</RRP_PromoteGroup>
+  <RRP_DemoteGroup>Move into the group above</RRP_DemoteGroup>
   <RRP_MoveGroupIntoItself>A group can't be moved inside itself.</RRP_MoveGroupIntoItself>
 
   <!-- Organizer -->
@@ -151,7 +153,8 @@
   <RRP_RenameTip>Renames the selected group. Clearing the name of a built-in group restores its usual name.</RRP_RenameTip>
   <RRP_MoveGroupInto>Move into...</RRP_MoveGroupInto>
   <RRP_MoveGroupIntoTip>Moves the selected group inside another group.</RRP_MoveGroupIntoTip>
-  <RRP_MoveToTopTip>Moves the selected group out to the top level.</RRP_MoveToTopTip>
+  <RRP_PromoteGroupTip>Moves the selected group out of the group it's in, placing it just below that group.</RRP_PromoteGroupTip>
+  <RRP_DemoteGroupTip>Moves the selected group inside the group just above it, at the end.</RRP_DemoteGroupTip>
   <RRP_GroupUp>Move up</RRP_GroupUp>
   <RRP_GroupUpTip>Moves the selected group above the one before it.</RRP_GroupUpTip>
   <RRP_GroupDown>Move down</RRP_GroupDown>

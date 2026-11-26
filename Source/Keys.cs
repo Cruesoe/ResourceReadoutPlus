@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Verse;
 
@@ -54,22 +55,22 @@ public static class Keys
 
     public static ThingDef? ThingOf(string key)
     {
-        return key.StartsWith(Thing) ? DefDatabase<ThingDef>.GetNamedSilentFail(key.Substring(Thing.Length)) : null;
+        return key.StartsWith(Thing, StringComparison.Ordinal) ? DefDatabase<ThingDef>.GetNamedSilentFail(key.Substring(Thing.Length)) : null;
     }
 
     // The category behind a "C:" or "F:" key.
     public static ThingCategoryDef? CategoryOf(string key)
     {
-        if (key.StartsWith(Category))
+        if (key.StartsWith(Category, StringComparison.Ordinal))
         {
             return DefDatabase<ThingCategoryDef>.GetNamedSilentFail(key.Substring(Category.Length));
         }
 
-        return key.StartsWith(Family) ? DefDatabase<ThingCategoryDef>.GetNamedSilentFail(key.Substring(Family.Length)) : null;
+        return key.StartsWith(Family, StringComparison.Ordinal) ? DefDatabase<ThingCategoryDef>.GetNamedSilentFail(key.Substring(Family.Length)) : null;
     }
 
     public static string? GroupOf(string key)
     {
-        return key.StartsWith(Group) ? key.Substring(Group.Length) : null;
+        return key.StartsWith(Group, StringComparison.Ordinal) ? key.Substring(Group.Length) : null;
     }
 }
