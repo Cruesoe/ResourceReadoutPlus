@@ -305,7 +305,7 @@ public static partial class ReadoutData
                 total = CountOf(thing);
                 label = thing.LabelCap;
             }
-            else if (key.StartsWith(Keys.Family) && Keys.CategoryOf(key) is ThingCategoryDef family)
+            else if (key.StartsWith(Keys.Family, StringComparison.Ordinal) && Keys.CategoryOf(key) is ThingCategoryDef family)
             {
                 total = FamilyTotal(family);
                 label = family.LabelCap;
@@ -596,7 +596,7 @@ public static partial class ReadoutData
                     AddThing(map, thing, 0, Keys.PinnedList, key, draggable: true);
                 }
             }
-            else if (key.StartsWith(Keys.Family) && Keys.CategoryOf(key) is ThingCategoryDef family)
+            else if (key.StartsWith(Keys.Family, StringComparison.Ordinal) && Keys.CategoryOf(key) is ThingCategoryDef family)
             {
                 ReadoutUnit unit = new ReadoutUnit { key = key, family = family };
                 foreach (ThingDef def in Resources)

@@ -51,10 +51,10 @@ public static class ReadoutCounts
         return MapCounts.TryGetValue(def, out int count) ? count : 0;
     }
 
-    // Any map, uncached; for trend samples.
-    public static int CountFresh(Map map, ThingDef def)
+    // Counts for trend samples on any map: the stored count, or a count-all thing's total from Tally.
+    public static int CountFresh(Map map, ThingDef def, Dictionary<ThingDef, int> tallied)
     {
-        return IsCountedAll(def) ? CountOnMap(map, def) : map.resourceCounter.GetCount(def);
+        return IsCountedAll(def) ? (tallied.TryGetValue(def, out int count) ? count : 0) : map.resourceCounter.GetCount(def);
     }
 
     // Spawned things of this kind lying outside storage, as the stored count would count them.
@@ -125,34 +125,43 @@ public static class ReadoutCounts
         countedMap = map;
         countedStamp = Stamp;
         countedSettings = Settings.version;
-        MapCounts.Clear();
-        foreach (ThingDef def in CountAllDefs)
-        {
-            MapCounts[def] = CountOnMap(map, def);
-        }
+        Tally(map, MapCounts);
     }
 
-    private static int CountOnMap(Map map, ThingDef def)
+    // Map-wide totals of every count-all thing, in one pass over the map's minified things, storage and colonists.
+    public static void Tally(Map map, Dictionary<ThingDef, int> into)
     {
-        int total = 0;
-        List<Thing> things = map.listerThings.ThingsOfDef(def);
-        for (int i = 0; i < things.Count; i++)
+        EnsureCountAll();
+        into.Clear();
+        if (CountAllDefs.Count == 0)
         {
-            Thing thing = things[i];
-            // Installed furniture shares its def with the minified item but is not stock.
-            if (thing.def.category != ThingCategory.Building && ShouldCount(thing, thing, map))
+            return;
+        }
+
+        foreach (ThingDef def in CountAllDefs)
+        {
+            int total = 0;
+            List<Thing> things = map.listerThings.ThingsOfDef(def);
+            for (int i = 0; i < things.Count; i++)
             {
-                total += thing.stackCount;
+                Thing thing = things[i];
+                // Installed furniture shares its def with the minified item but is not stock.
+                if (thing.def.category != ThingCategory.Building && ShouldCount(thing, thing, map))
+                {
+                    total += thing.stackCount;
+                }
             }
+
+            into[def] = total;
         }
 
         List<Thing> minified = map.listerThings.ThingsInGroup(ThingRequestGroup.MinifiedThing);
         for (int i = 0; i < minified.Count; i++)
         {
             Thing inner = minified[i].GetInnerIfMinified();
-            if (inner != minified[i] && inner.def == def && ShouldCount(minified[i], inner, map))
+            if (inner != minified[i] && CountAllDefs.Contains(inner.def) && ShouldCount(minified[i], inner, map))
             {
-                total += inner.stackCount;
+                into[inner.def] += inner.stackCount;
             }
         }
 
@@ -168,33 +177,30 @@ public static class ReadoutCounts
                 }
 
                 Thing inner = held.GetInnerIfMinified();
-                if (inner.def == def && !inner.IsNotFresh())
+                if (CountAllDefs.Contains(inner.def) && !inner.IsNotFresh())
                 {
-                    total += inner.stackCount;
+                    into[inner.def] += inner.stackCount;
                 }
             }
         }
 
         if (Settings.countCarried)
         {
-            total += Carried(map, def);
+            TallyCarried(map, into);
         }
-
-        return total;
     }
 
     // Carried by colonists on the map or in their inventories.
-    private static int Carried(Map map, ThingDef def)
+    private static void TallyCarried(Map map, Dictionary<ThingDef, int> into)
     {
-        int total = 0;
         List<Pawn> colonists = map.mapPawns.FreeColonistsSpawned;
         for (int i = 0; i < colonists.Count; i++)
         {
             Pawn pawn = colonists[i];
             Thing? carried = pawn.carryTracker?.CarriedThing;
-            if (carried != null && carried.GetInnerIfMinified().def == def)
+            if (carried != null && CountAllDefs.Contains(carried.GetInnerIfMinified().def))
             {
-                total += carried.stackCount;
+                into[carried.GetInnerIfMinified().def] += carried.stackCount;
             }
 
             ThingOwner? inventory = pawn.inventory?.innerContainer;
@@ -206,14 +212,13 @@ public static class ReadoutCounts
             for (int j = 0; j < inventory.Count; j++)
             {
                 Thing item = inventory[j];
-                if (item.GetInnerIfMinified().def == def)
+                ThingDef def = item.GetInnerIfMinified().def;
+                if (CountAllDefs.Contains(def))
                 {
-                    total += item.stackCount;
+                    into[def] += item.stackCount;
                 }
             }
         }
-
-        return total;
     }
 
     // The base game's rule for stored things: no rotten food and nothing under fog.

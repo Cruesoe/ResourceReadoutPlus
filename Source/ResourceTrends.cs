@@ -15,6 +15,9 @@ public class ResourceTrends : TrendBook
     // Bumped after each sample; the readout rebuilds its arrows.
     public static int Version;
 
+    // Per sample: count-all totals of the map being sampled.
+    private static readonly Dictionary<ThingDef, int> Tallied = new Dictionary<ThingDef, int>();
+
     // Maps sampled so far, so a removed map's records can be dropped.
     private List<int> mapIds = new List<int>();
 
@@ -96,9 +99,10 @@ public class ResourceTrends : TrendBook
                 mapIds.Add(map.uniqueID);
             }
 
+            ReadoutCounts.Tally(map, Tallied);
             foreach (ThingDef def in map.resourceCounter.AllCountedAmounts.Keys)
             {
-                int count = ReadoutCounts.CountFresh(map, def);
+                int count = ReadoutCounts.CountFresh(map, def, Tallied);
                 string id = Id(map, def);
                 if (count > 0 || Known(id))
                 {
